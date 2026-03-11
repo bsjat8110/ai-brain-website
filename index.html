@@ -631,16 +631,58 @@
       <div class="chat-modal__header">
         <div class="chat-modal__title">🧠 AI Brain Chat</div>
         <div class="chat-modal__controls">
-          <select class="chat-modal__model-select" id="model-select">
-            <option value="gemini">Google Gemini</option>
-            <option value="openai">OpenAI GPT</option>
-            <option value="claude">Anthropic Claude</option>
-            <option value="custom">Custom API</option>
-          </select>
-          <button class="chat-modal__clear" id="chat-clear" title="Clear conversation">🗑️</button>
-          <button class="chat-modal__close" id="chat-close" title="Close">✕</button>
+          <div class="chat-modal__active-model" id="active-model-indicator">
+            <span class="active-dot"></span> <span id="active-model-name">Gemini Fast</span>
+          </div>
+          <button class="chat-modal__icon-btn" id="chat-settings-btn" title="Provider Settings">⚙️</button>
+          <button class="chat-modal__icon-btn" id="chat-clear" title="Clear conversation">🗑️</button>
+          <button class="chat-modal__icon-btn" id="chat-close" title="Close">✕</button>
         </div>
       </div>
+      
+      <!-- Provider Settings Panel (Hidden by default) -->
+      <div class="provider-settings" id="provider-settings-panel">
+        <div class="provider-settings__header">
+          <h4>AI Provider Settings</h4>
+          <button class="provider-settings__close" id="provider-settings-close">✕</button>
+        </div>
+        
+        <div class="provider-settings__group">
+          <label>Provider</label>
+          <div class="provider-tabs" id="provider-tabs">
+            <button class="provider-tab active" data-provider="gemini">Gemini</button>
+            <button class="provider-tab" data-provider="openai">ChatGPT</button>
+            <button class="provider-tab" data-provider="claude">Claude</button>
+            <button class="provider-tab" data-provider="custom">Custom</button>
+          </div>
+        </div>
+
+        <div class="provider-settings__group" id="model-group">
+          <label>Model Tier</label>
+          <div class="model-pills" id="model-pills">
+            <button class="model-pill active" data-tier="fast">Fast</button>
+            <button class="model-pill" data-tier="medium">Medium</button>
+            <button class="model-pill" data-tier="pro">Pro</button>
+          </div>
+        </div>
+
+        <!-- Custom Provider Specifics -->
+        <div class="provider-settings__group custom-only hidden" id="custom-fields">
+          <label>API Endpoint URL</label>
+          <input type="text" id="custom-endpoint" placeholder="https://your-api.com/v1/chat/completions" class="provider-input" />
+          <label>Model Name</label>
+          <input type="text" id="custom-model" placeholder="llama-3-70b" class="provider-input" />
+        </div>
+
+        <div class="provider-settings__group">
+          <label>API Key</label>
+          <input type="password" id="provider-api-key" placeholder="Enter API Key here..." class="provider-input" />
+          <p class="provider-hint">Keys are stored locally in your browser and never sent anywhere except the official provider API.</p>
+        </div>
+
+        <button class="btn btn--primary btn--full" id="provider-connect-btn">Connect Provider</button>
+      </div>
+
       <div class="chat-modal__messages" id="chat-messages">
         <div class="chat-modal__welcome">
           <span class="chat-modal__welcome-icon">🧠</span>
