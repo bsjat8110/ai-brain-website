@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Brain — Persistent Artificial Intelligence</title>
+  <meta name="description" content="AI Brain is an experimental AI research initiative exploring persistent memory systems, autonomous agents, and long-term intelligence architectures." />
+  <meta property="og:title" content="AI Brain — Persistent Artificial Intelligence" />
+  <meta property="og:description" content="Building persistent memory systems, autonomous agents, and long-term intelligence architectures." />
+  <meta property="og:type" content="website" />
+  <meta name="theme-color" content="#06080f" />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧠</text></svg>" />
+</head>
+<body>
+
+  <!-- ═══════════ NAVIGATION ═══════════ -->
+  <nav class="nav" id="nav">
+    <div class="nav__inner">
+      <a href="#" class="nav__logo">
+        <span class="nav__logo-icon">🧠</span>
+        AI Brain
+      </a>
+      <ul class="nav__links" id="nav-links">
+        <li><a href="#architecture" class="nav__link">Architecture</a></li>
+        <li><a href="#agents" class="nav__link">Agents</a></li>
+        <li><a href="#research" class="nav__link">Research</a></li>
+        <li><a href="#roadmap" class="nav__link">Roadmap</a></li>
+        <li><a href="#about" class="nav__link">About</a></li>
+        <li><a href="#contact" class="nav__link">Contact</a></li>
+      </ul>
+      <a href="#waitlist" class="btn btn--primary btn--sm nav__cta">Early Access</a>
+      <button class="nav__mobile-toggle" id="mobile-toggle" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ═══════════ HERO ═══════════ -->
+  <section class="hero section" id="hero">
+    <div class="hero__bg">
+      <div class="bg-glow hero__glow-1"></div>
+      <div class="bg-glow hero__glow-2"></div>
+    </div>
+    <div class="container">
+      <div class="hero__content">
+        <div class="hero__text">
+          <div class="hero__status">
+            <span class="status-dot"></span>
+            System Active — Research Mode
+          </div>
+          <h1 class="hero__title">
+            <span class="hero__title-gradient">AI Brain</span>
+          </h1>
+          <p class="hero__subtitle">Building Persistent Artificial Intelligence</p>
+          <p class="hero__description">
+            AI Brain is an experimental AI research initiative exploring persistent memory systems, autonomous agents, and long-term intelligence architectures.
+          </p>
+          <div class="hero__actions">
+            <a href="#search" class="btn btn--primary btn--lg">Try AI Brain</a>
+            <a href="#architecture" class="btn btn--secondary btn--lg">View Architecture</a>
+            <a href="#research" class="btn btn--outline btn--lg">Read Research</a>
+          </div>
+          <div class="hero__stats">
+            <div>
+              <div class="hero__stat-value">5+</div>
+              <div class="hero__stat-label">Research Areas</div>
+            </div>
+            <div>
+              <div class="hero__stat-value">∞</div>
+              <div class="hero__stat-label">Memory Capacity</div>
+            </div>
+            <div>
+              <div class="hero__stat-value">24/7</div>
+              <div class="hero__stat-label">Agent Runtime</div>
+            </div>
+          </div>
+        </div>
+        <div class="hero__visual">
+          <div class="hero__brain-container">
+            <canvas id="hero-brain-canvas"></canvas>
+            <div class="hero__brain-ring hero__brain-ring--1"></div>
+            <div class="hero__brain-ring hero__brain-ring--2"></div>
+            <div class="hero__brain-ring hero__brain-ring--3"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════ AI SEARCH ═══════════ -->
+  <section class="search section" id="search">
+    <div class="container">
+      <div class="search__container reveal">
+        <div class="search__input-wrap">
+          <span class="search__icon">⚡</span>
+          <input type="text" class="search__input" id="search-input" placeholder="Ask AI Brain anything..." readonly />
+          <span class="search__shortcut">⌘K</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════ PROBLEM ═══════════ -->
+  <section class="problem section" id="problem">
+    <div class="container">
+      <div class="section__header reveal">
+        <span class="section__badge"><span class="badge-dot"></span> The Challenge</span>
+        <h2 class="section__title">The Problem with Current AI</h2>
+        <p class="section__subtitle">Today's AI systems forget everything between sessions. They lack persistent memory, autonomous action, and true long-term intelligence.</p>
+      </div>
+      <div class="problem__grid">
+        <div class="card problem__card reveal reveal-delay-1">
+          <span class="problem__icon">🔄</span>
+          <h3 class="card__title">No Persistent Memory</h3>
+          <p class="card__description">Current AI forgets context between conversations. Every interaction starts from zero — no learning, no growth, no continuity.</p>
+        </div>
+        <div class="card problem__card reveal reveal-delay-2">
+          <span class="problem__icon">⛓️</span>
+          <h3 class="card__title">No Autonomous Action</h3>
+          <p class="card__description">AI can't act on its own. It waits for prompts, can't plan ahead, and can't execute multi-step tasks independently.</p>
+        </div>
+        <div class="card problem__card reveal reveal-delay-3">
+          <span class="problem__icon">🧩</span>
+          <h3 class="card__title">No Knowledge Synthesis</h3>
+          <p class="card__description">AI systems can't build knowledge over time. They lack the ability to connect ideas, form insights, and create understanding.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════ INTRODUCING AI BRAIN ═══════════ -->
+  <section class="intro section" id="intro">
+    <div class="container">
+      <div class="intro__content reveal">
+        <span class="section__badge"><span class="badge-dot"></span> Introducing</span>
+        <h2 class="intro__logo"><span class="text-gradient">AI Brain</span></h2>
+        <p class="intro__text">
+          AI Brain is a next-generation intelligence architecture designed to remember, learn, reason, and act autonomously. It's not just an AI assistant — it's a persistent cognitive system that evolves with every interaction.
+        </p>
+        <div class="intro__features">
+          <span class="tag">🧠 Persistent Memory</span>
+          <span class="tag">🤖 Autonomous Agents</span>
+          <span class="tag">🔗 Knowledge Graphs</span>
+          <span class="tag">⚡ Real-time Learning</span>
+          <span class="tag">🌐 Distributed Intelligence</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════ ARCHITECTURE ═══════════ -->
+  <section class="architecture section" id="architecture">
+    <div class="container">
+      <div class="section__header reveal">
+        <span class="section__badge"><span class="badge-dot"></span> System Design</span>
+        <h2 class="section__title">AI Brain Architecture</h2>
+        <p class="section__subtitle">A modular, interconnected system designed for persistent intelligence, autonomous reasoning, and continuous learning.</p>
+      </div>
+      <div class="architecture__diagram reveal">
+        <canvas id="architecture-canvas"></canvas>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════ AGENTS ═══════════ -->
+  <section class="section" id="agents">
+    <div class="container">
+      <div class="section__header reveal">
+        <span class="section__badge"><span class="badge-dot"></span> Autonomous Systems</span>
+        <h2 class="section__title">Autonomous Agent Network</h2>
+        <p class="section__subtitle">Specialized AI agents that work independently and collaboratively to accomplish complex tasks.</p>
+      </div>
+      <div class="agents__grid">
+        <div class="card agent-card reveal reveal-delay-1">
+          <div class="card__icon">🔬</div>
+          <h3 class="card__title">Research Agent</h3>
+          <p class="card__description">Explores, analyzes, and synthesizes information across domains.</p>
+        </div>
+        <div class="card agent-card reveal reveal-delay-2">
+          <div class="card__icon">💻</div>
+          <h3 class="card__title">Coding Agent</h3>
+          <p class="card__description">Writes, debugs, and optimizes code across languages & frameworks.</p>
+        </div>
+        <div class="card agent-card reveal reveal-delay-3">
+          <div class="card__icon">🎯</div>
+          <h3 class="card__title">Strategy Agent</h3>
+          <p class="card__description">Plans, evaluates, and recommends strategic decisions.</p>
+        </div>
+        <div class="card agent-card reveal reveal-delay-4">
+          <div class="card__icon">📚</div>
+          <h3 class="card__title">Knowledge Agent</h3>
+          <p class="card__description">Manages and connects knowledge graph data in real-time.</p>
+        </div>
+        <div class="card agent-card reveal reveal-delay-5">
+          <div class="card__icon">⚙️</div>
+          <h3 class="card__title">Automation Agent</h3>
+          <p class="card__description">Executes workflows and manages autonomous task pipelines.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════ MEMORY ═══════════ -->
+  <section class="section" id="memory">
+    <div class="container">
+      <div class="section__header reveal">
+        <span class="section__badge"><span class="badge-dot"></span> Core Technology</span>
+        <h2 class="section__title">Persistent Memory Engine</h2>
+        <p class="section__subtitle">AI Brain maintains persistent long-term memory — remembering context, ideas, projects, and knowledge across every interaction.</p>
+      </div>
+      <div class="memory__grid">
+        <div class="card memory-card reveal reveal-delay-1">
+          <div class="card__icon">💬</div>
+          <h3 class="card__title">Conversation Memory</h3>
+          <p class="card__description">Retains context from every conversation, building continuity over time.</p>
+        </div>
+        <div class="card memory-card reveal reveal-delay-2">
+          <div class="card__icon">💡</div>
+          <h3 class="card__title">Idea Memory</h3>
+          <p class="card__description">Stores and connects creative ideas, evolving them into actionable insights.</p>
+        </div>
+        <div class="card memory-card reveal reveal-delay-3">
+          <div class="card__icon">📁</div>
+          <h3 class="card__title">Project Memory</h3>
+          <p class="card__description">Tracks project states, milestones, and historical decisions persistently.</p>
+        </div>
+        <div class="card memory-card reveal reveal-delay-4">
+          <div class="card__icon">🔗</div>
+          <h3 class="card__title">Knowledge Graph</h3>
+          <p class="card__description">Maps relationships between concepts, creating a web of interconnected knowledge.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════ SYSTEM MAP ═══════════ -->
+  <section class="systemmap section" id="systemmap">
+    <div class="container">
+      <div class="section__header reveal">
+        <span class="section__badge"><span class="badge-dot"></span> System Overview</span>
+        <h2 class="section__title">Interactive System Map</h2>
+        <p class="section__subtitle">Visualize how AI Brain components connect and communicate in real-time.</p>
+      </div>
+      <div class="systemmap__visual reveal">
+        <canvas id="systemmap-canvas"></canvas>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════ RESEARCH LAB ═══════════ -->
+  <section class="section" id="research">
+    <div class="container">
+      <div class="section__header reveal">
+        <span class="section__badge"><span class="badge-dot"></span> Research Lab</span>
+        <h2 class="section__title">AI Brain Research Lab</h2>
+        <p class="section__subtitle">Advancing the frontiers of persistent intelligence, autonomous systems, and human-AI cognitive interfaces.</p>
+      </div>
+      <div class="research__grid">
+        <div class="card research-card reveal reveal-delay-1">
+          <div class="card__icon">🧠</div>
+          <h3 class="card__title">Persistent AI Memory</h3>
+          <p class="card__description">Researching architectures for long-term memory storage, retrieval, and contextual reasoning in AI systems.</p>
+        </div>
+        <div class="card research-card reveal reveal-delay-2">
+          <div class="card__icon">🤖</div>
+          <h3 class="card__title">Autonomous Agent Systems</h3>
+          <p class="card__description">Developing agent frameworks capable of independent planning, execution, and self-improvement.</p>
+        </div>
+        <div class="card research-card reveal reveal-delay-3">
+          <div class="card__icon">🔗</div>
+          <h3 class="card__title">Knowledge Graph Intelligence</h3>
+          <p class="card__description">Building dynamic knowledge representation systems that evolve and reason about relationships.</p>
+        </div>
+        <div class="card research-card reveal reveal-delay-1">
+          <div class="card__icon">🧬</div>
+          <h3 class="card__title">Human-AI Interfaces</h3>
+          <p class="card__description">Exploring cognitive interfaces that enable seamless collaboration between human and artificial intelligence.</p>
+        </div>
+        <div class="card research-card reveal reveal-delay-2">
+          <div class="card__icon">📈</div>
+          <h3 class="card__title">Continuous Learning</h3>
+          <p class="card__description">Creating systems that learn incrementally without forgetting — bridging the gap to true lifelong learning.</p>
+        </div>
+        <div class="card research-card reveal reveal-delay-3">
+          <div class="card__icon">🌐</div>
+          <h3 class="card__title">Distributed Intelligence</h3>
+          <p class="card__description">Investigating multi-agent distributed architectures for collaborative intelligence at scale.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════ USE CASES ═══════════ -->
+  <section class="section" id="usecases">
+    <div class="container">
+      <div class="section__header reveal">
+        <span class="section__badge"><span class="badge-dot"></span> Applications</span>
+        <h2 class="section__title">Use Cases</h2>
+        <p class="section__subtitle">How AI Brain transforms productivity, research, and decision-making across domains.</p>
+      </div>
+      <div class="usecases__grid">
+        <div class="card usecase-card reveal reveal-delay-1">
+          <div class="card__icon">🔬</div>
+          <h3 class="card__title">AI Research Assistant</h3>
+          <p class="card__description">A persistent research companion that remembers every paper, insight, and hypothesis.</p>
+        </div>
+        <div class="card usecase-card reveal reveal-delay-2">
+          <div class="card__icon">🚀</div>
+          <h3 class="card__title">Startup Strategy AI</h3>
+          <p class="card__description">Strategic advisor that learns your business, tracks market shifts, and evolves recommendations.</p>
+        </div>
+        <div class="card usecase-card reveal reveal-delay-3">
+          <div class="card__icon">🧠</div>
+          <h3 class="card__title">Personal Digital Brain</h3>
+          <p class="card__description">Your second brain — remembering everything, connecting ideas, and surfacing insights when needed.</p>
+        </div>
+        <div class="card usecase-card reveal reveal-delay-4">
+          <div class="card__icon">📋</div>
+          <h3 class="card__title">Autonomous PM</h3>
+          <p class="card__description">Project manager that plans, tracks, and adapts — managing complex projects autonomously.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════ GLOBAL NETWORK ═══════════ -->
+  <section class="network section" id="network">
+    <div class="container">
+      <div class="section__header reveal">
+        <span class="section__badge"><span class="badge-dot"></span> Vision</span>
+        <h2 class="section__title">Global Intelligence Network</h2>
+        <p class="section__subtitle">The long-term vision: a distributed system where multiple AI brains share knowledge and intelligence.</p>
+      </div>
+      <div class="network__visual reveal">
+        <canvas id="network-canvas"></canvas>
+      </div>
+      <p class="network__text reveal">
+        Imagine a world where AI systems maintain persistent memory, learn continuously, and share knowledge across a global network. AI Brain is building the foundation for that future — a decentralized intelligence mesh where distributed AI brains collaborate, reason, and evolve together.
+      </p>
+    </div>
+  </section>
+
+  <!-- ═══════════ CLOUD ═══════════ -->
+  <section class="section" id="cloud">
+    <div class="container">
+      <div class="section__header reveal">
+        <span class="section__badge"><span class="badge-dot"></span> Infrastructure</span>
+        <h2 class="section__title">AI Brain Cloud</h2>
+        <p class="section__subtitle">Distributed infrastructure for persistent memory and autonomous agents at scale.</p>
+      </div>
+      <div class="cloud__content reveal">
+        <div class="cloud__text">
+          <h3 class="text-gradient">Cloud-Native Intelligence</h3>
+          <p>AI Brain Cloud provides the distributed infrastructure needed to run persistent AI systems at global scale. Built for reliability, low latency, and infinite scalability.</p>
+          <div class="cloud__features">
+            <div class="cloud__feature"><span class="cloud__feature-icon">⚡</span> Low-latency memory access across regions</div>
+            <div class="cloud__feature"><span class="cloud__feature-icon">🔒</span> End-to-end encrypted memory storage</div>
+            <div class="cloud__feature"><span class="cloud__feature-icon">📈</span> Auto-scaling agent compute infrastructure</div>
+            <div class="cloud__feature"><span class="cloud__feature-icon">🌍</span> Multi-region distributed knowledge sync</div>
+            <div class="cloud__feature"><span class="cloud__feature-icon">🔄</span> Real-time agent orchestration layer</div>
+          </div>
+        </div>
+        <div class="cloud__visual">
+          <div class="cloud__graphic"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════ ROADMAP ═══════════ -->
+  <section class="section" id="roadmap">
+    <div class="container">
+      <div class="section__header reveal">
+        <span class="section__badge"><span class="badge-dot"></span> Timeline</span>
+        <h2 class="section__title">Technology Roadmap</h2>
+        <p class="section__subtitle">The path from persistent memory to global intelligence.</p>
+      </div>
+      <div class="roadmap__timeline">
+        <div class="roadmap__item reveal reveal-delay-1">
+          <div class="roadmap__dot"></div>
+          <div class="roadmap__year">2026</div>
+          <h3 class="roadmap__title">AI Memory Architecture</h3>
+          <p class="roadmap__desc">Core persistent memory systems, knowledge graph foundations, and initial agent framework research.</p>
+        </div>
+        <div class="roadmap__item reveal reveal-delay-2">
+          <div class="roadmap__dot"></div>
+          <div class="roadmap__year">2027</div>
+          <h3 class="roadmap__title">Autonomous Agent System</h3>
+          <p class="roadmap__desc">Multi-agent orchestration, autonomous task execution, and real-time learning loop implementation.</p>
+        </div>
+        <div class="roadmap__item reveal reveal-delay-3">
+          <div class="roadmap__dot"></div>
+          <div class="roadmap__year">2028</div>
+          <h3 class="roadmap__title">AI Brain Platform</h3>
+          <p class="roadmap__desc">Full platform launch with persistent memory, autonomous agents, knowledge graphs, and developer APIs.</p>
+        </div>
+        <div class="roadmap__item reveal reveal-delay-4">
+          <div class="roadmap__dot"></div>
+          <div class="roadmap__year">2029+</div>
+          <h3 class="roadmap__title">Global Intelligence Network</h3>
+          <p class="roadmap__desc">Distributed multi-brain intelligence mesh, cross-system knowledge sharing, and collaborative AI reasoning.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════ COLLABORATION ═══════════ -->
+  <section class="collab section" id="collab">
+    <div class="container">
+      <div class="section__header reveal">
+        <span class="section__badge"><span class="badge-dot"></span> Partner With Us</span>
+        <h2 class="section__title">Collaboration</h2>
+      </div>
+      <p class="collab__text reveal">
+        AI Brain welcomes collaboration with researchers, developers, and infrastructure partners exploring the future of persistent AI systems. Whether you're building autonomous agents, working on memory architectures, or advancing knowledge graph technologies — let's push the boundaries together.
+      </p>
+      <div class="reveal">
+        <a href="#contact" class="btn btn--primary btn--lg">Get in Touch</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════ WHITEPAPER ═══════════ -->
+  <section class="whitepaper section" id="whitepaper">
+    <div class="container">
+      <div class="section__header reveal">
+        <span class="section__badge"><span class="badge-dot"></span> Research Paper</span>
+        <h2 class="section__title">Whitepaper</h2>
+      </div>
+      <div class="card whitepaper__card reveal">
+        <span class="whitepaper__icon">📄</span>
+        <h3 class="whitepaper__title">AI Brain:</h3>
+        <p class="whitepaper__subtitle">Persistent Memory for Autonomous Intelligence</p>
+        <a href="#" class="btn btn--secondary btn--lg" onclick="event.preventDefault()">Download Whitepaper (Coming Soon)</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════ ABOUT ═══════════ -->
+  <section class="about section" id="about">
+    <div class="container">
+      <div class="section__header reveal">
+        <span class="section__badge"><span class="badge-dot"></span> About</span>
+        <h2 class="section__title">About AI Brain</h2>
+      </div>
+      <div class="about__content reveal">
+        <p class="about__text">
+          AI Brain is an experimental AI research initiative focused on building the next generation of intelligent systems. We believe that true artificial intelligence requires persistent memory, autonomous reasoning, and the ability to learn and grow over time.
+        </p>
+        <p class="about__text">
+          Our mission is to create AI architectures that don't just respond to prompts — they remember, plan, learn, and evolve. We're building the foundational technology for persistent intelligence, starting with memory systems and autonomous agents, and scaling toward a global network of interconnected AI brains.
+        </p>
+        <p class="about__text">
+          Founded with the vision that AI should be more than a tool — it should be a cognitive partner that grows with you.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════ WAITLIST ═══════════ -->
+  <section class="waitlist section" id="waitlist">
+    <div class="container">
+      <div class="section__header reveal">
+        <span class="section__badge"><span class="badge-dot"></span> Join Us</span>
+        <h2 class="section__title">Early Access Waitlist</h2>
+        <p class="section__subtitle">Be among the first to experience persistent AI intelligence. Sign up for early access to the AI Brain platform.</p>
+      </div>
+      <form class="waitlist__form reveal" onsubmit="event.preventDefault(); this.querySelector('button').textContent='✓ Joined!'; this.querySelector('button').disabled=true;">
+        <input type="email" class="waitlist__input" placeholder="Enter your email address" required />
+        <button type="submit" class="btn btn--primary btn--lg">Join Waitlist</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- ═══════════ CONTACT ═══════════ -->
+  <section class="section" id="contact">
+    <div class="container">
+      <div class="section__header reveal">
+        <span class="section__badge"><span class="badge-dot"></span> Contact</span>
+        <h2 class="section__title">Get in Touch</h2>
+        <p class="section__subtitle">Reach out for collaboration, research inquiries, or partnership opportunities.</p>
+      </div>
+      <div class="contact__content">
+        <div class="card contact-item reveal reveal-delay-1">
+          <span class="contact-item__icon">👤</span>
+          <div class="contact-item__label">Founder</div>
+          <div class="contact-item__value">Bhoja Ram Choudhary</div>
+        </div>
+        <div class="card contact-item reveal reveal-delay-2">
+          <span class="contact-item__icon">📞</span>
+          <div class="contact-item__label">Phone</div>
+          <div class="contact-item__value"><a href="tel:+919461127967">+91 94611 27967</a></div>
+        </div>
+        <div class="card contact-item reveal reveal-delay-3">
+          <span class="contact-item__icon">✉️</span>
+          <div class="contact-item__label">Email</div>
+          <div class="contact-item__value">
+            <a href="mailto:aibrainstartups@proton.me">aibrainstartups@proton.me</a><br/>
+            <a href="mailto:bsjat3989@gmail.com">bsjat3989@gmail.com</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════ FOOTER ═══════════ -->
+  <footer class="footer" id="footer">
+    <div class="container">
+      <div class="footer__content">
+        <div class="footer__logo">
+          <span class="footer__logo-icon">🧠</span>
+          AI Brain
+        </div>
+        <ul class="footer__links">
+          <li><a href="#architecture" class="footer__link">Architecture</a></li>
+          <li><a href="#agents" class="footer__link">Agents</a></li>
+          <li><a href="#research" class="footer__link">Research</a></li>
+          <li><a href="#roadmap" class="footer__link">Roadmap</a></li>
+          <li><a href="#whitepaper" class="footer__link">Whitepaper</a></li>
+          <li><a href="#contact" class="footer__link">Contact</a></li>
+        </ul>
+      </div>
+      <p class="footer__copy">© 2026 AI Brain. All rights reserved. Building the future of persistent intelligence.</p>
+    </div>
+  </footer>
+
+  <!-- ═══════════ CHAT MODAL ═══════════ -->
+  <div class="chat-modal" id="chat-modal">
+    <div class="chat-modal__overlay" id="chat-overlay"></div>
+    <div class="chat-modal__container">
+      <div class="chat-modal__header">
+        <div class="chat-modal__title">🧠 AI Brain Chat</div>
+        <div class="chat-modal__controls">
+          <select class="chat-modal__model-select" id="model-select">
+            <option value="gemini">Google Gemini</option>
+            <option value="openai">OpenAI GPT</option>
+            <option value="claude">Anthropic Claude</option>
+            <option value="custom">Custom API</option>
+          </select>
+          <button class="chat-modal__clear" id="chat-clear" title="Clear conversation">🗑️</button>
+          <button class="chat-modal__close" id="chat-close" title="Close">✕</button>
+        </div>
+      </div>
+      <div class="chat-modal__messages" id="chat-messages">
+        <div class="chat-modal__welcome">
+          <span class="chat-modal__welcome-icon">🧠</span>
+          <h3 class="chat-modal__welcome-title">Welcome to AI Brain</h3>
+          <p class="chat-modal__welcome-text">Ask anything about AI Brain's architecture, research areas, or capabilities. This is a demo interface — connect your API key to use a real AI provider.</p>
+        </div>
+      </div>
+      <div class="chat-modal__input-area">
+        <input type="text" class="chat-modal__input" id="chat-input" placeholder="Type your message..." />
+        <button class="chat-modal__send" id="chat-send">Send</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
