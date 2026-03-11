@@ -31,7 +31,7 @@ export function initChat() {
   if (!searchInput || !chatModal) return;
 
   // --- STATE MANAGEMENT ---
-  let messages = [];
+  let messages = JSON.parse(localStorage.getItem('aiData_history') || '[]');
   let isStreaming = false;
 
   let state = {
@@ -156,6 +156,7 @@ export function initChat() {
 
   function clearChat() {
     messages = [];
+    localStorage.removeItem('aiData_history'); // Wipe topic memory
     chatMessages.innerHTML = `
       <div class="chat-modal__welcome">
         <span class="chat-modal__welcome-icon">🧠</span>
@@ -164,6 +165,31 @@ export function initChat() {
       </div>
     `;
   }
+
+  function renderHistory() {
+    if (messages.length === 0) {
+      clearChat();
+      return;
+    }
+    
+    // Clear welcome message before re-rendering history
+    chatMessages.innerHTML = '';
+    
+    messages.forEach(msg => {
+      // Create element directly without triggering auto-scroll or system checks
+      const msgEl = document.createElement('div');
+      msgEl.className = `chat-message chat-message--${msg.role === 'user' ? 'user' : 'ai'}`;
+      msgEl.innerHTML = `
+        <div class="chat-message__avatar">${msg.role === 'user' ? '👤' : '🧠'}</div>
+        <div class="chat-message__content">${formatMessage(msg.content)}</div>
+      `;
+      chatMessages.appendChild(msgEl);
+    });
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+
+  // Initial render when script loads
+  renderHistory();
 
   function addMessageUI(content, isUser = false) {
     const welcome = chatMessages.querySelector('.chat-modal__welcome');
@@ -192,6 +218,7 @@ export function initChat() {
     
     // Add User message
     messages.push({ role: 'user', content: text });
+    localStorage.setItem('aiData_history', JSON.stringify(messages)); // Persist immediately
     addMessageUI(text, true);
 
     const apiKey = state.keys[state.provider];
@@ -230,10 +257,12 @@ export function initChat() {
         state.availableModels[state.provider] || []
       );
       messages.push({ role: 'assistant', content: aiResponseText });
+      localStorage.setItem('aiData_history', JSON.stringify(messages)); // Persist the completed AI response
     } catch (err) {
       aiResponseText += `\n\n**Error:** ${err.message}`;
       contentEl.innerHTML = formatMessage(aiResponseText);
       messages.pop(); // Revert user message to prevent breaking context window
+      localStorage.setItem('aiData_history', JSON.stringify(messages)); // Sync erased context memory
     } finally {
       chatMessages.scrollTop = chatMessages.scrollHeight;
       isStreaming = false;
