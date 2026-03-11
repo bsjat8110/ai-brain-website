@@ -32,5 +32,5 @@ document.addEventListener('DOMContentLoaded', () => {
   initSystemMap();
   initNetworkGlobe();
 
-  console.log('🧠 AI Brain initialized');
+
 });

@@ -188,7 +188,7 @@ export async function streamAIResponse(provider, tier, apiKey, messages, onChunk
      
      if (!fallbackModel) throw err; // No fallback available
      
-     console.log(`[AI Router] Re-routing to fallback: ${fallbackModel}`);
+     console.warn(`[AI Router] Re-routing to fallback: ${fallbackModel}`);
      await tryStream(fallbackModel);
   }
 }
