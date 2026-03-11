@@ -136,12 +136,8 @@
     grid-template-columns: repeat(2, 1fr);
   }
 
-  .problem__grid {
-    grid-template-columns: 1fr;
-  }
-
-  .research__grid {
-    grid-template-columns: 1fr;
+  .premium-card {
+    flex: 0 0 280px;
   }
 
   .grid--2,
