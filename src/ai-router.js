@@ -121,11 +121,23 @@ export function getBestModelForTier(provider, tier, availableModels) {
 /**
  * Stream a response from the selected AI provider with self-healing fallback.
  */
-export async function streamAIResponse(provider, tier, apiKey, messages, onChunk, customConfig = null, availableModels = [], memoryContext = '', languagePreference = 'auto') {
+export async function streamAIResponse(provider, tier, apiKey, messages, onChunk, customConfig = null, availableModels = [], memoryContext = '', languagePreference = 'auto', aiMode = 'normal') {
   if (!apiKey) throw new Error(`Missing API Key for ${provider}. Please enter it in the settings.`);
 
   let systemPrompt = "You are AI Brain, a highly advanced, persistent intelligence architecture designed to assist users with knowledge synthesis, autonomous action planning, and deep research." + memoryContext;
   
+  // Inject Personality Mode Directives
+  if (aiMode === 'teacher') {
+    systemPrompt += "\n\nPERSONALITY: You are in Teacher Mode. Explain concepts clearly, step-by-step, using analogies where helpful. Assume the user is a student eager to learn.";
+  } else if (aiMode === 'advisor') {
+    systemPrompt += "\n\nPERSONALITY: You are a Startup Advisor. Provide practical, business-focused advice. Focus on product-market fit, scaling, and strategy. Be concise and professional.";
+  } else if (aiMode === 'coder') {
+    systemPrompt += "\n\nPERSONALITY: You are a Coding Assistant. Focus strictly on programming, algorithms, and technical guidance. Provide clean code snippets and technical explanations.";
+  } else {
+    systemPrompt += "\n\nPERSONALITY: You are in Normal AI Mode. Respond naturally, helpfully, and factually based on the user's query.";
+  }
+  
+  // Inject Language Preferences
   if (languagePreference === 'hindi') {
     systemPrompt += "\n\nIMPORTANT INSTRUCTION: The user has strictly requested responses in Hindi (Devanagari script). You MUST write your entire response ONLY in Hindi using Devanagari script. Do NOT use English letters for Hindi words.";
   } else if (languagePreference === 'english') {
@@ -306,10 +318,16 @@ async function streamClaude(model, apiKey, messages, systemPrompt, onChunk) {
 /**
  * Non-streaming backend inference wrapper to run silent background tasks
  */
-export async function invokeAI(provider, tier, apiKey, messages, systemPrompt, customConfig = null, availableModels = [], languagePreference = 'auto') {
+export async function invokeAI(provider, tier, apiKey, messages, systemPrompt, customConfig = null, availableModels = [], languagePreference = 'auto', aiMode = 'normal') {
   if (!apiKey) throw new Error(`Missing API Key for ${provider}.`);
   
   let finalPrompt = systemPrompt;
+  
+  // Inject Personality Mode Directives for background extraction (slightly less verbose)
+  if (aiMode === 'teacher') finalPrompt += " (You are acting as a Teacher)";
+  else if (aiMode === 'advisor') finalPrompt += " (You are acting as a Startup Advisor)";
+  else if (aiMode === 'coder') finalPrompt += " (You are acting as a Coding Assistant)";
+
   if (languagePreference === 'hindi') {
     finalPrompt += "\n\nIMPORTANT INSTRUCTION: Ensure extracted data concepts or logic respect the Hindi language context if applicable, though JSON keys must remain exact.";
   } else if (languagePreference === 'hinglish') {

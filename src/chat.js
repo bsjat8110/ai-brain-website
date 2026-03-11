@@ -15,6 +15,7 @@ export function initChat() {
   const chatSend = document.getElementById('chat-send');
   const chatMessages = document.getElementById('chat-messages');
   const chatLangDropdown = document.getElementById('chat-lang-dropdown');
+  const chatModeDropdown = document.getElementById('chat-mode-dropdown');
 
   // Provider Settings Elements
   const settingsBtn = document.getElementById('chat-settings-btn');
@@ -40,6 +41,7 @@ export function initChat() {
     provider: localStorage.getItem('aiData_provider') || 'gemini',
     tier: localStorage.getItem('aiData_tier') || 'fast',
     language: localStorage.getItem('aiData_language') || 'auto',
+    aiMode: localStorage.getItem('aiData_mode') || 'normal',
     keys: JSON.parse(localStorage.getItem('aiData_keys') || '{}'),
     custom: JSON.parse(localStorage.getItem('aiData_custom') || '{"endpoint":"","model":""}'),
     availableModels: JSON.parse(localStorage.getItem('aiData_models') || '{}')
@@ -60,8 +62,9 @@ export function initChat() {
     providerTabs.forEach(t => t.classList.toggle('active', t.dataset.provider === state.provider));
     modelPills.forEach(p => p.classList.toggle('active', p.dataset.tier === state.tier));
     
-    // Sync language dropdown
+    // Sync dropdowns
     if (chatLangDropdown) chatLangDropdown.value = state.language;
+    if (chatModeDropdown) chatModeDropdown.value = state.aiMode;
     
     if (state.provider === 'custom') {
       customFields.classList.remove('hidden');
@@ -79,6 +82,7 @@ export function initChat() {
     localStorage.setItem('aiData_provider', state.provider);
     localStorage.setItem('aiData_tier', state.tier);
     localStorage.setItem('aiData_language', state.language);
+    localStorage.setItem('aiData_mode', state.aiMode);
     localStorage.setItem('aiData_keys', JSON.stringify(state.keys));
     localStorage.setItem('aiData_custom', JSON.stringify(state.custom));
     localStorage.setItem('aiData_models', JSON.stringify(state.availableModels));
@@ -117,7 +121,14 @@ export function initChat() {
     chatLangDropdown.addEventListener('change', (e) => {
       state.language = e.target.value;
       saveState();
-      // Don't auto-open settings panel for dropdown changes in the header
+    });
+  }
+
+  if (chatModeDropdown) {
+    chatModeDropdown.addEventListener('change', (e) => {
+      state.aiMode = e.target.value;
+      saveState();
+      clearChat(); // Wipe history so the new persona isn't confused by old chat blocks
     });
   }
 
@@ -302,7 +313,8 @@ export function initChat() {
         state.custom,
         state.availableModels[state.provider] || [],
         graphContext,
-        state.language
+        state.language,
+        state.aiMode
       );
       
       messages.push({ role: 'assistant', content: aiResponseText });
@@ -318,7 +330,8 @@ export function initChat() {
          EXTRACTION_PROMPT, 
          state.custom, 
          state.availableModels[state.provider] || [],
-         state.language
+         state.language,
+         state.aiMode
       ).then(jsonExtraction => {
          if(jsonExtraction) mergeKnowledge(jsonExtraction);
       }).catch(e => console.warn("Background extraction skipped."));
