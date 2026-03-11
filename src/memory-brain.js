@@ -91,8 +91,12 @@ export function retrieveContext(userMessage) {
  */
 export function mergeKnowledge(jsonString) {
   try {
-    // Sanitize markdown blocks if the LLM wraps the response
-    const cleanJsonString = jsonString.replace(/^```json/i, '').replace(/^```/, '').replace(/```$/, '').trim();
+    // Robustly extract JSON block by finding the first '{' and last '}'
+    const start = jsonString.indexOf('{');
+    const end = jsonString.lastIndexOf('}');
+    if (start === -1 || end === -1) return; // No JSON found
+
+    const cleanJsonString = jsonString.substring(start, end + 1);
     const extraction = JSON.parse(cleanJsonString);
     let memory = getMemory();
 

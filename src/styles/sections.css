@@ -355,82 +355,133 @@
   color: var(--color-text-muted);
 }
 
-/* ─── Marquee Animations & Premium Cards ─── */
-.infinite-marquee {
-  width: 100%;
-  overflow: hidden;
-  position: relative;
-  display: flex;
-  padding: var(--space-4) 0 var(--space-8);
-  mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
-  -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
-}
-
-.marquee-track {
-  display: flex;
-  gap: var(--space-6);
-  width: max-content;
-  animation: scroll-marquee-4 15s linear infinite;
-  padding-left: var(--space-6);
-  will-change: transform;
-}
-
-.marquee-track:hover {
-  animation-play-state: paused;
-}
-
-.marquee-track--reverse {
-  animation-direction: reverse;
-}
-
-@keyframes scroll-marquee-4 {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(calc(-25% - calc(var(--space-6) * 0.25))); }
-}
-
-@keyframes scroll-marquee-2 {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(calc(-50% - calc(var(--space-6) * 0.5))); }
-}
-
-.research .marquee-track {
-  animation: scroll-marquee-2 25s linear infinite;
-}
-.research .marquee-track--reverse {
-  animation: scroll-marquee-2 25s linear infinite reverse;
-}
-
-.premium-card {
-  flex: 0 0 340px;
-  background: rgba(10, 14, 26, 0.6);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), inset 0 0 0 1px rgba(255, 255, 255, 0.05), inset 0 0 20px rgba(0, 212, 255, 0.02);
-  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease, border-color 0.4s ease;
-}
-
-.premium-card:hover {
-  transform: translateY(-8px);
-  border-color: rgba(0, 212, 255, 0.3);
-  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5), inset 0 0 0 1px rgba(0, 212, 255, 0.2), 0 0 30px rgba(0, 212, 255, 0.1);
-  background: rgba(14, 20, 36, 0.7);
-}
-
-/* ─── Problem Section ─── */
+/* ─── AGI Search Section (Next-Gen) ─── */
 .problem {
   position: relative;
+  padding: var(--space-20) 0;
 }
 
-.problem__card {
-  text-align: center;
-  padding: var(--space-10);
+.agi-search-outer {
+  max-width: 900px;
+  margin: var(--space-12) auto 0;
+  position: relative;
 }
 
-.problem__icon {
-  font-size: 2.5rem;
-  margin-bottom: var(--space-4);
-  display: block;
+.agi-search-console {
+  background: rgba(10, 14, 26, 0.4);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(0, 212, 255, 0.2);
+  border-radius: var(--radius-2xl);
+  padding: var(--space-1);
+  box-shadow: 
+    0 30px 60px rgba(0, 0, 0, 0.4),
+    inset 0 0 40px rgba(0, 212, 255, 0.05),
+    0 0 100px rgba(123, 97, 255, 0.05);
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.agi-search-console:focus-within {
+  border-color: rgba(0, 212, 255, 0.6);
+  box-shadow: 
+    0 40px 80px rgba(0, 0, 0, 0.6),
+    0 0 40px rgba(0, 212, 255, 0.2);
+  transform: translateY(-5px);
+}
+
+.agi-input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-6) var(--space-8);
+}
+
+.agi-prompt-symbol {
+  color: var(--color-accent-primary);
+  font-family: var(--font-mono);
+  font-size: 1.4rem;
+  font-weight: 900;
+  text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+}
+
+.agi-input {
+  flex: 1;
+  background: none;
+  border: none;
+  outline: none;
+  font-family: var(--font-mono);
+  font-size: 1.2rem;
+  color: var(--color-text-primary);
+  caret-color: var(--color-accent-primary);
+}
+
+.agi-input::placeholder {
+  color: var(--color-text-muted);
+  opacity: 0.5;
+}
+
+.agi-btn {
+  background: linear-gradient(135deg, var(--color-accent-primary), var(--color-accent-secondary));
+  border: none;
+  padding: var(--space-3) var(--space-8);
+  border-radius: var(--radius-full);
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  box-shadow: 0 10px 20px rgba(0, 212, 255, 0.2);
+  white-space: nowrap;
+}
+
+.agi-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 15px 30px rgba(0, 212, 255, 0.4);
+}
+
+.agi-sparkle {
+  font-size: 1.1rem;
+}
+
+.agi-terminal-log {
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  padding: var(--space-6) var(--space-8);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  min-height: 120px;
+  max-height: 250px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.agi-terminal-log.hidden {
+  display: none;
+}
+
+.log-entry {
+  display: flex;
+  gap: var(--space-3);
+  opacity: 0;
+  animation: fadeIn 0.3s forwards;
+}
+
+.log-entry.primary { color: var(--color-accent-primary); }
+.log-entry.secondary { color: var(--color-accent-secondary); }
+.log-entry.success { color: #00ffaa; }
+
+.log-timestamp {
+  opacity: 0.4;
+  color: var(--color-text-muted);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateX(-5px); }
+  to { opacity: 1; transform: translateX(0); }
 }
 
 /* ─── Intro Section ─── */
@@ -546,6 +597,47 @@
 }
 
 /* ─── Research Section ─── */
+.research {
+    position: relative;
+    padding: var(--space-20) 0;
+}
+
+.research .infinite-marquee {
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    padding: var(--space-4) 0 var(--space-8);
+    mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+    -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+}
+
+.research .marquee-track {
+    display: flex;
+    gap: var(--space-6);
+    width: max-content;
+    animation: scroll-marquee 30s linear infinite;
+    padding-left: var(--space-6);
+    will-change: transform;
+}
+
+.research .marquee-track:hover {
+    animation-play-state: paused;
+}
+
+.research .marquee-track--reverse {
+    animation-direction: reverse;
+}
+
+.research-card {
+    flex: 0 0 540px;
+    text-align: center;
+}
+
+@keyframes scroll-marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(calc(-50% - (var(--space-6) / 2))); }
+}
 
 .research-card {
   padding: var(--space-8);
@@ -554,6 +646,8 @@
 .research-card .card__icon {
   background: linear-gradient(135deg, rgba(0, 255, 163, 0.12), rgba(0, 212, 255, 0.12));
   border-color: rgba(0, 255, 163, 0.15);
+  margin-left: auto;
+  margin-right: auto;
 }
 
 /* ─── Use Cases Section ─── */

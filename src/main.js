@@ -15,6 +15,7 @@ import { initArchitecture } from './architecture.js';
 import { initSystemMap } from './systemmap.js';
 import { initNetworkGlobe } from './networkglobe.js';
 import { initNavigation } from './navigation.js';
+import { initAGISearch } from './agisearch.js';
 
 // Initialize everything when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
@@ -22,6 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initNavigation();
   initAnimations();
   initChat();
+  initAGISearch();
 
   // Visual systems  
   initParticles();

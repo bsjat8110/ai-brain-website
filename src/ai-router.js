@@ -134,7 +134,7 @@ export async function streamAIResponse(provider, tier, apiKey, messages, onChunk
   } else if (aiMode === 'coder') {
     systemPrompt += "\n\nPERSONALITY: You are a Coding Assistant. Focus strictly on programming, algorithms, and technical guidance. Provide clean code snippets and technical explanations.";
   } else {
-    systemPrompt += "\n\nPERSONALITY: You are in Normal AI Mode. Respond naturally, helpfully, and factually based on the user's query.";
+    systemPrompt += "\n\nPERSONALITY: You are in AI Brain Mode. Respond naturally, helpfully, and factually based on the user's query.";
   }
   
   // Inject Language Preferences
