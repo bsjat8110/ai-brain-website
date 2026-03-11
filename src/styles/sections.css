@@ -370,7 +370,7 @@
   display: flex;
   gap: var(--space-6);
   width: max-content;
-  animation: scroll-marquee-4 60s linear infinite;
+  animation: scroll-marquee-4 15s linear infinite;
   padding-left: var(--space-6);
   will-change: transform;
 }
@@ -394,10 +394,10 @@
 }
 
 .research .marquee-track {
-  animation: scroll-marquee-2 50s linear infinite;
+  animation: scroll-marquee-2 25s linear infinite;
 }
 .research .marquee-track--reverse {
-  animation: scroll-marquee-2 50s linear infinite reverse;
+  animation: scroll-marquee-2 25s linear infinite reverse;
 }
 
 .premium-card {
