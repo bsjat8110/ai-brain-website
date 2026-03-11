@@ -409,11 +409,6 @@
 }
 
 /* Chat Header active model and buttons */
-.chat-modal__controls {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-}
 
 .chat-lang-dropdown {
   background: rgba(10, 14, 26, 0.6);

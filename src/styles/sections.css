@@ -1073,11 +1073,24 @@
 
 .chat-modal__header {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: var(--space-5) var(--space-6);
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-6);
   border-bottom: 1px solid var(--color-border);
   background: var(--glass-bg);
+}
+
+.chat-modal__header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.chat-modal__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
 }
 
 .chat-modal__title {
@@ -1092,6 +1105,8 @@
   display: flex;
   align-items: center;
   gap: var(--space-3);
+  width: 100%;
+  flex-wrap: wrap; /* Allows dropdowns to wrap beautifully if viewport gets aggressively small */
 }
 
 .chat-modal__model-select {

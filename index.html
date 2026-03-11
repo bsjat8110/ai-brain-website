@@ -629,7 +629,14 @@
     <div class="chat-modal__overlay" id="chat-overlay"></div>
     <div class="chat-modal__container">
       <div class="chat-modal__header">
-        <div class="chat-modal__title">🧠 AI Brain Chat</div>
+        <div class="chat-modal__header-top">
+          <div class="chat-modal__title">🧠 AI Brain Chat</div>
+          <div class="chat-modal__actions">
+            <button class="chat-modal__icon-btn" id="chat-settings-btn" title="Provider Settings">⚙️</button>
+            <button class="chat-modal__icon-btn" id="chat-clear" title="Clear conversation">🗑️</button>
+            <button class="chat-modal__icon-btn" id="chat-close" title="Close">✕</button>
+          </div>
+        </div>
         <div class="chat-modal__controls">
           <div class="chat-modal__lang-selector">
             <select id="chat-mode-dropdown" class="chat-lang-dropdown">
@@ -648,9 +655,6 @@
           <div class="chat-modal__active-model" id="active-model-indicator">
             <span class="active-dot"></span> <span id="active-model-name">Gemini Fast</span>
           </div>
-          <button class="chat-modal__icon-btn" id="chat-settings-btn" title="Provider Settings">⚙️</button>
-          <button class="chat-modal__icon-btn" id="chat-clear" title="Clear conversation">🗑️</button>
-          <button class="chat-modal__icon-btn" id="chat-close" title="Close">✕</button>
         </div>
       </div>
       
