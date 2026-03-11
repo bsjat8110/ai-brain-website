@@ -121,10 +121,10 @@ export function getBestModelForTier(provider, tier, availableModels) {
 /**
  * Stream a response from the selected AI provider with self-healing fallback.
  */
-export async function streamAIResponse(provider, tier, apiKey, messages, onChunk, customConfig = null, availableModels = []) {
+export async function streamAIResponse(provider, tier, apiKey, messages, onChunk, customConfig = null, availableModels = [], memoryContext = '') {
   if (!apiKey) throw new Error(`Missing API Key for ${provider}. Please enter it in the settings.`);
 
-  const systemPrompt = "You are AI Brain, a highly advanced, persistent intelligence architecture designed to assist users with knowledge synthesis, autonomous action planning, and deep research.";
+  const systemPrompt = "You are AI Brain, a highly advanced, persistent intelligence architecture designed to assist users with knowledge synthesis, autonomous action planning, and deep research." + memoryContext;
 
   let targetModel = getBestModelForTier(provider, tier, availableModels);
   if (provider === 'custom') targetModel = customConfig.model;
@@ -291,4 +291,59 @@ async function streamClaude(model, apiKey, messages, systemPrompt, onChunk) {
       }
     }
   }
+}
+
+/* --- BACKGROUND KNOWLEDGE EXTRACTION (NON-STREAMING) --- */
+
+/**
+ * Invokes the AI model for a silent, non-streaming background task (like memory extraction).
+ * Fast fail and no stream parsing.
+ */
+export async function invokeAI(provider, tier, apiKey, messages, systemPrompt, customConfig = null, availableModels = []) {
+  let model = getBestModelForTier(provider, tier, availableModels);
+  if (provider === 'custom') model = customConfig.model;
+  
+  if (provider === 'openai') {
+     const formattedMessages = [{ role: 'system', content: systemPrompt }, ...messages];
+     const res = await fetch('https://api.openai.com/v1/chat/completions', {
+       method: 'POST',
+       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+       body: JSON.stringify({ model, messages: formattedMessages, stream: false })
+     });
+     if(res.ok) {
+       const data = await res.json();
+       return data.choices[0].message.content;
+     }
+  } else if (provider === 'gemini') {
+     const contents = messages.map(m => ({
+        role: m.role === 'assistant' ? 'model' : 'user',
+        parts: [{ text: m.content }]
+     }));
+     contents.unshift({ role: "user", parts: [{ text: `SYSTEM DIRECTIVE: ${systemPrompt}` }] });
+     const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contents })
+     });
+     if(res.ok) {
+        const data = await res.json();
+        return data.candidates?.[0]?.content?.parts?.[0]?.text || "";
+     }
+  } else if (provider === 'claude') {
+     const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': apiKey,
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerously-allow-browser': 'true'
+        },
+        body: JSON.stringify({ model, max_tokens: 1024, system: systemPrompt, messages, stream: false })
+     });
+     if(res.ok) {
+        const data = await res.json();
+        return data.content[0].text;
+     }
+  }
+  return "";
 }

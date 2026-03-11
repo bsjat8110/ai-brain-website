@@ -2,7 +2,8 @@
    AI BRAIN — Chat System with Multi-Provider Support
    ═══════════════════════════════════════════════════════════ */
 
-import { streamAIResponse, validateProviderConnection } from './ai-router.js';
+import { streamAIResponse, validateProviderConnection, invokeAI } from './ai-router.js';
+import { retrieveContext, mergeKnowledge, EXTRACTION_PROMPT } from './memory-brain.js';
 
 export function initChat() {
   const searchInput = document.getElementById('search-input');
@@ -241,8 +242,12 @@ export function initChat() {
     const contentEl = msgEl.querySelector('.chat-message__content');
     
     let aiResponseText = "";
+    let backgroundMemoryTask = null;
 
     try {
+      // Memory Context Retrieval (Silent keyword mapping before request)
+      const graphContext = retrieveContext(text);
+
       await streamAIResponse(
         state.provider, 
         state.tier, 
@@ -254,10 +259,27 @@ export function initChat() {
           chatMessages.scrollTop = chatMessages.scrollHeight;
         },
         state.custom,
-        state.availableModels[state.provider] || []
+        state.availableModels[state.provider] || [],
+        graphContext
       );
+      
       messages.push({ role: 'assistant', content: aiResponseText });
       localStorage.setItem('aiData_history', JSON.stringify(messages)); // Persist the completed AI response
+      
+      // Fire-and-forget background extraction onto localized memory (does not block user interaction)
+      const recentExchange = messages.slice(-2);
+      backgroundMemoryTask = invokeAI(
+         state.provider, 
+         state.tier, 
+         apiKey, 
+         recentExchange, 
+         EXTRACTION_PROMPT, 
+         state.custom, 
+         state.availableModels[state.provider] || []
+      ).then(jsonExtraction => {
+         if(jsonExtraction) mergeKnowledge(jsonExtraction);
+      }).catch(e => console.warn("Background extraction skipped."));
+
     } catch (err) {
       aiResponseText += `\n\n**Error:** ${err.message}`;
       contentEl.innerHTML = formatMessage(aiResponseText);
