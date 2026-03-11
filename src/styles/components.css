@@ -394,6 +394,20 @@
   display: none;
 }
 
+.provider-error {
+  background: rgba(255, 60, 60, 0.1);
+  border: 1px solid rgba(255, 60, 60, 0.3);
+  border-radius: var(--radius-sm);
+  padding: var(--space-3);
+  color: #ff6b6b;
+  font-size: var(--text-xs);
+  line-height: var(--leading-tight);
+}
+
+.provider-error.hidden {
+  display: none;
+}
+
 /* Chat Header active model and buttons */
 .chat-modal__controls {
   display: flex;

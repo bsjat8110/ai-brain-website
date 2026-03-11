@@ -2,7 +2,7 @@
    AI BRAIN — Chat System with Multi-Provider Support
    ═══════════════════════════════════════════════════════════ */
 
-import { streamAIResponse } from './ai-router.js';
+import { streamAIResponse, validateProviderConnection } from './ai-router.js';
 
 export function initChat() {
   const searchInput = document.getElementById('search-input');
@@ -26,6 +26,7 @@ export function initChat() {
   const customEndpointInput = document.getElementById('custom-endpoint');
   const customModelInput = document.getElementById('custom-model');
   const activeModelName = document.getElementById('active-model-name');
+  const errorBox = document.getElementById('provider-error');
 
   if (!searchInput || !chatModal) return;
 
@@ -37,7 +38,8 @@ export function initChat() {
     provider: localStorage.getItem('aiData_provider') || 'gemini',
     tier: localStorage.getItem('aiData_tier') || 'fast',
     keys: JSON.parse(localStorage.getItem('aiData_keys') || '{}'),
-    custom: JSON.parse(localStorage.getItem('aiData_custom') || '{"endpoint":"","model":""}')
+    custom: JSON.parse(localStorage.getItem('aiData_custom') || '{"endpoint":"","model":""}'),
+    availableModels: JSON.parse(localStorage.getItem('aiData_models') || '{}')
   };
 
   const providerDisplayNames = { gemini: 'Gemini', openai: 'GPT', claude: 'Claude', custom: 'Custom' };
@@ -72,22 +74,26 @@ export function initChat() {
     localStorage.setItem('aiData_tier', state.tier);
     localStorage.setItem('aiData_keys', JSON.stringify(state.keys));
     localStorage.setItem('aiData_custom', JSON.stringify(state.custom));
+    localStorage.setItem('aiData_models', JSON.stringify(state.availableModels));
     updateActiveModelIndicator();
   }
 
   // --- PANEL UI EVENTS ---
   settingsBtn.addEventListener('click', () => {
     settingsPanel.classList.toggle('active');
+    errorBox.classList.add('hidden');
     syncUIToState();
   });
 
   settingsClose.addEventListener('click', () => {
     settingsPanel.classList.remove('active');
+    errorBox.classList.add('hidden');
   });
 
   providerTabs.forEach(btn => {
     btn.addEventListener('click', () => {
       state.provider = btn.dataset.provider;
+      errorBox.classList.add('hidden');
       syncUIToState();
     });
   });
@@ -99,19 +105,39 @@ export function initChat() {
     });
   });
 
-  connectBtn.addEventListener('click', () => {
+  connectBtn.addEventListener('click', async () => {
     const key = apiKeyInput.value.trim();
     if (state.provider === 'custom') {
       state.custom.endpoint = customEndpointInput.value.trim();
       state.custom.model = customModelInput.value.trim();
     }
-    state.keys[state.provider] = key;
-    saveState();
-    connectBtn.textContent = '✓ Connected';
-    setTimeout(() => {
+    
+    // UI Validation State
+    connectBtn.textContent = 'Validating...';
+    connectBtn.disabled = true;
+    errorBox.classList.add('hidden');
+    
+    try {
+      const models = await validateProviderConnection(state.provider, key, state.provider === 'custom' ? state.custom : null);
+      
+      // Save valid state
+      state.keys[state.provider] = key;
+      state.availableModels[state.provider] = models;
+      saveState();
+      
+      connectBtn.textContent = '✓ Connected';
+      setTimeout(() => {
+        connectBtn.textContent = 'Connect Provider';
+        connectBtn.disabled = false;
+        settingsPanel.classList.remove('active');
+      }, 1500);
+      
+    } catch (err) {
+      errorBox.textContent = err.message || 'Connection failed. Please check your configurations.';
+      errorBox.classList.remove('hidden');
       connectBtn.textContent = 'Connect Provider';
-      settingsPanel.classList.remove('active');
-    }, 1500);
+      connectBtn.disabled = false;
+    }
   });
 
   // --- CHAT LOGIC ---
@@ -200,7 +226,8 @@ export function initChat() {
           contentEl.innerHTML = formatMessage(aiResponseText);
           chatMessages.scrollTop = chatMessages.scrollHeight;
         },
-        state.custom
+        state.custom,
+        state.availableModels[state.provider] || []
       );
       messages.push({ role: 'assistant', content: aiResponseText });
     } catch (err) {
