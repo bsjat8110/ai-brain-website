@@ -631,6 +631,14 @@
       <div class="chat-modal__header">
         <div class="chat-modal__title">🧠 AI Brain Chat</div>
         <div class="chat-modal__controls">
+          <div class="chat-modal__lang-selector">
+            <select id="chat-lang-dropdown" class="chat-lang-dropdown">
+              <option value="auto">Auto Language</option>
+              <option value="english">English</option>
+              <option value="hindi">हिन्दी (Hindi)</option>
+              <option value="hinglish">Hinglish</option>
+            </select>
+          </div>
           <div class="chat-modal__active-model" id="active-model-indicator">
             <span class="active-dot"></span> <span id="active-model-name">Gemini Fast</span>
           </div>
@@ -666,14 +674,7 @@
           </div>
         </div>
         
-        <div class="provider-settings__group" id="language-group">
-          <label>Preferred Language</label>
-          <div class="model-pills" id="language-pills">
-            <button class="model-pill language-pill active" data-lang="auto">Auto</button>
-            <button class="model-pill language-pill" data-lang="english">English</button>
-            <button class="model-pill language-pill" data-lang="hindi">हिन्दी</button>
-          </div>
-        </div>
+
 
         <!-- Custom Provider Specifics -->
         <div class="provider-settings__group custom-only hidden" id="custom-fields">

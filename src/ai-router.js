@@ -130,6 +130,8 @@ export async function streamAIResponse(provider, tier, apiKey, messages, onChunk
     systemPrompt += "\n\nIMPORTANT INSTRUCTION: The user has strictly requested responses in Hindi (Devanagari script). You MUST write your entire response ONLY in Hindi using Devanagari script. Do NOT use English letters for Hindi words.";
   } else if (languagePreference === 'english') {
     systemPrompt += "\n\nIMPORTANT INSTRUCTION: The user has strictly requested responses in English. You MUST reply ONLY in English.";
+  } else if (languagePreference === 'hinglish') {
+    systemPrompt += "\n\nIMPORTANT INSTRUCTION: The user has strictly requested responses in Hinglish. You MUST reply using a natural mix of Hindi and English words, written entirely in the English/Latin alphabet. (e.g. 'Ye feature bahut useful hai, isse start karte hain.').";
   }
 
   let targetModel = getBestModelForTier(provider, tier, availableModels);
@@ -310,6 +312,8 @@ export async function invokeAI(provider, tier, apiKey, messages, systemPrompt, c
   let finalPrompt = systemPrompt;
   if (languagePreference === 'hindi') {
     finalPrompt += "\n\nIMPORTANT INSTRUCTION: Ensure extracted data concepts or logic respect the Hindi language context if applicable, though JSON keys must remain exact.";
+  } else if (languagePreference === 'hinglish') {
+    finalPrompt += "\n\nIMPORTANT INSTRUCTION: Ensure extracted data concepts or logic respect the Hinglish language context if applicable, though JSON keys must remain exact.";
   }
 
   let targetModel = getBestModelForTier(provider, tier, availableModels);

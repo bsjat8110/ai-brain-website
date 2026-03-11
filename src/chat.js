@@ -14,6 +14,7 @@ export function initChat() {
   const chatInput = document.getElementById('chat-input');
   const chatSend = document.getElementById('chat-send');
   const chatMessages = document.getElementById('chat-messages');
+  const chatLangDropdown = document.getElementById('chat-lang-dropdown');
 
   // Provider Settings Elements
   const settingsBtn = document.getElementById('chat-settings-btn');
@@ -59,8 +60,8 @@ export function initChat() {
     providerTabs.forEach(t => t.classList.toggle('active', t.dataset.provider === state.provider));
     modelPills.forEach(p => p.classList.toggle('active', p.dataset.tier === state.tier));
     
-    // Sync language pills
-    document.querySelectorAll('.language-pill').forEach(p => p.classList.toggle('active', p.dataset.lang === state.language));
+    // Sync language dropdown
+    if (chatLangDropdown) chatLangDropdown.value = state.language;
     
     if (state.provider === 'custom') {
       customFields.classList.remove('hidden');
@@ -106,15 +107,19 @@ export function initChat() {
 
   modelPills.forEach(btn => {
     btn.addEventListener('click', () => {
-      if (btn.classList.contains('language-pill')) {
-        state.language = btn.dataset.lang;
-      } else {
-        state.tier = btn.dataset.tier;
-      }
+      state.tier = btn.dataset.tier;
       syncUIToState();
       saveState();
     });
   });
+
+  if (chatLangDropdown) {
+    chatLangDropdown.addEventListener('change', (e) => {
+      state.language = e.target.value;
+      saveState();
+      // Don't auto-open settings panel for dropdown changes in the header
+    });
+  }
 
   connectBtn.addEventListener('click', async () => {
     const key = apiKeyInput.value.trim();
@@ -220,6 +225,29 @@ export function initChat() {
     return text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
   }
 
+  // --- TOKEN COMPACTION ENGINE ---
+  function compactHistory() {
+    // A rough estimation of tokens: length of stringified history / 4
+    const historyString = JSON.stringify(messages);
+    const estimatedTokens = historyString.length / 4;
+    
+    // Safety Threshold (e.g. 50,000 tokens for average model context safety limit)
+    const TOKEN_LIMIT = 50000;
+    
+    if (estimatedTokens > TOKEN_LIMIT) {
+      console.warn(`[AI Router] Token limit approaching (${Math.round(estimatedTokens)}). Compacting history...`);
+      // Keep the most recent 10-20% of the conversation (approx last 4 messages) to maintain immediate context
+      messages = messages.slice(-4);
+      localStorage.setItem('aiData_history', JSON.stringify(messages));
+      
+      // Inject a subtle UI notice
+      const notice = document.createElement('div');
+      notice.className = 'chat-message chat-message--ai';
+      notice.innerHTML = `<span style="font-size: 0.8rem; color: var(--color-text-secondary); opacity: 0.7;">⚙️ System: Chat history compacted to preserve memory & context bounds.</span>`;
+      chatMessages.appendChild(notice);
+    }
+  }
+
   async function sendMessage() {
     if (isStreaming) return;
     const text = chatInput.value.trim();
@@ -255,7 +283,10 @@ export function initChat() {
     let backgroundMemoryTask = null;
 
     try {
-      // Memory Context Retrieval (Silent keyword mapping before request)
+      // 1. Compact History before Request
+      compactHistory();
+      
+      // 2. Memory Context Retrieval (Silent keyword mapping before request)
       const graphContext = retrieveContext(text);
 
       await streamAIResponse(
