@@ -121,10 +121,16 @@ export function getBestModelForTier(provider, tier, availableModels) {
 /**
  * Stream a response from the selected AI provider with self-healing fallback.
  */
-export async function streamAIResponse(provider, tier, apiKey, messages, onChunk, customConfig = null, availableModels = [], memoryContext = '') {
+export async function streamAIResponse(provider, tier, apiKey, messages, onChunk, customConfig = null, availableModels = [], memoryContext = '', languagePreference = 'auto') {
   if (!apiKey) throw new Error(`Missing API Key for ${provider}. Please enter it in the settings.`);
 
-  const systemPrompt = "You are AI Brain, a highly advanced, persistent intelligence architecture designed to assist users with knowledge synthesis, autonomous action planning, and deep research." + memoryContext;
+  let systemPrompt = "You are AI Brain, a highly advanced, persistent intelligence architecture designed to assist users with knowledge synthesis, autonomous action planning, and deep research." + memoryContext;
+  
+  if (languagePreference === 'hindi') {
+    systemPrompt += "\n\nIMPORTANT INSTRUCTION: The user has strictly requested responses in Hindi (Devanagari script). You MUST write your entire response ONLY in Hindi using Devanagari script. Do NOT use English letters for Hindi words.";
+  } else if (languagePreference === 'english') {
+    systemPrompt += "\n\nIMPORTANT INSTRUCTION: The user has strictly requested responses in English. You MUST reply ONLY in English.";
+  }
 
   let targetModel = getBestModelForTier(provider, tier, availableModels);
   if (provider === 'custom') targetModel = customConfig.model;
@@ -296,54 +302,58 @@ async function streamClaude(model, apiKey, messages, systemPrompt, onChunk) {
 /* --- BACKGROUND KNOWLEDGE EXTRACTION (NON-STREAMING) --- */
 
 /**
- * Invokes the AI model for a silent, non-streaming background task (like memory extraction).
- * Fast fail and no stream parsing.
+ * Non-streaming backend inference wrapper to run silent background tasks
  */
-export async function invokeAI(provider, tier, apiKey, messages, systemPrompt, customConfig = null, availableModels = []) {
-  let model = getBestModelForTier(provider, tier, availableModels);
-  if (provider === 'custom') model = customConfig.model;
+export async function invokeAI(provider, tier, apiKey, messages, systemPrompt, customConfig = null, availableModels = [], languagePreference = 'auto') {
+  if (!apiKey) throw new Error(`Missing API Key for ${provider}.`);
   
-  if (provider === 'openai') {
-     const formattedMessages = [{ role: 'system', content: systemPrompt }, ...messages];
-     const res = await fetch('https://api.openai.com/v1/chat/completions', {
-       method: 'POST',
-       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
-       body: JSON.stringify({ model, messages: formattedMessages, stream: false })
-     });
-     if(res.ok) {
-       const data = await res.json();
-       return data.choices[0].message.content;
-     }
-  } else if (provider === 'gemini') {
-     const contents = messages.map(m => ({
-        role: m.role === 'assistant' ? 'model' : 'user',
-        parts: [{ text: m.content }]
-     }));
-     contents.unshift({ role: "user", parts: [{ text: `SYSTEM DIRECTIVE: ${systemPrompt}` }] });
-     const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ contents })
-     });
-     if(res.ok) {
-        const data = await res.json();
-        return data.candidates?.[0]?.content?.parts?.[0]?.text || "";
-     }
-  } else if (provider === 'claude') {
-     const res = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': apiKey,
-          'anthropic-version': '2023-06-01',
-          'anthropic-dangerously-allow-browser': 'true'
-        },
-        body: JSON.stringify({ model, max_tokens: 1024, system: systemPrompt, messages, stream: false })
-     });
-     if(res.ok) {
-        const data = await res.json();
-        return data.content[0].text;
-     }
+  let finalPrompt = systemPrompt;
+  if (languagePreference === 'hindi') {
+    finalPrompt += "\n\nIMPORTANT INSTRUCTION: Ensure extracted data concepts or logic respect the Hindi language context if applicable, though JSON keys must remain exact.";
   }
-  return "";
+
+  let targetModel = getBestModelForTier(provider, tier, availableModels);
+  if (provider === 'custom') targetModel = customConfig.model;
+
+  // Find fallback if needed
+  let modelToTry = targetModel;
+
+  try {
+    if (provider === 'gemini') {
+      const contents = messages.map(m => ({ role: m.role === 'assistant' ? 'model' : 'user', parts: [{ text: m.content }] }));
+      contents.unshift({ role: "user", parts: [{ text: `SYSTEM DIRECTIVE: ${finalPrompt}` }] });
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelToTry}:generateContent?key=${apiKey}`;
+      const response = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents }) });
+      if(!response.ok) return null;
+      const data = await response.json();
+      return data.candidates?.[0]?.content?.parts?.[0]?.text || null;
+      
+    } else if (provider === 'openai' || provider === 'custom') {
+      const baseUrl = provider === 'custom' ? customConfig.endpoint : 'https://api.openai.com/v1/chat/completions';
+      const formattedMessages = [{ role: 'system', content: finalPrompt }, ...messages];
+      const response = await fetch(baseUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+        body: JSON.stringify({ model: modelToTry, messages: formattedMessages })
+      });
+      if(!response.ok) return null;
+      const data = await response.json();
+      return data.choices?.[0]?.message?.content || null;
+      
+    } else if (provider === 'claude') {
+      const formattedMessages = messages.map(m => ({ role: m.role, content: m.content }));
+      const response = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerously-allow-browser': 'true' },
+        body: JSON.stringify({ model: modelToTry, max_tokens: 1024, system: finalPrompt, messages: formattedMessages })
+      });
+      if(!response.ok) return null;
+      const data = await response.json();
+      return data.content?.[0]?.text || null;
+    }
+  } catch(e) {
+    console.error(`[AI Router] Invoke AI failed for ${provider} with model ${modelToTry}:`, e);
+    return null; // Return null on error instead of throwing, for silent background tasks
+  }
+  return null; // Should not be reached if provider is handled, but as a safeguard
 }

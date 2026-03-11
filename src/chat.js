@@ -38,6 +38,7 @@ export function initChat() {
   let state = {
     provider: localStorage.getItem('aiData_provider') || 'gemini',
     tier: localStorage.getItem('aiData_tier') || 'fast',
+    language: localStorage.getItem('aiData_language') || 'auto',
     keys: JSON.parse(localStorage.getItem('aiData_keys') || '{}'),
     custom: JSON.parse(localStorage.getItem('aiData_custom') || '{"endpoint":"","model":""}'),
     availableModels: JSON.parse(localStorage.getItem('aiData_models') || '{}')
@@ -58,6 +59,9 @@ export function initChat() {
     providerTabs.forEach(t => t.classList.toggle('active', t.dataset.provider === state.provider));
     modelPills.forEach(p => p.classList.toggle('active', p.dataset.tier === state.tier));
     
+    // Sync language pills
+    document.querySelectorAll('.language-pill').forEach(p => p.classList.toggle('active', p.dataset.lang === state.language));
+    
     if (state.provider === 'custom') {
       customFields.classList.remove('hidden');
       customEndpointInput.value = state.custom.endpoint;
@@ -73,6 +77,7 @@ export function initChat() {
   function saveState() {
     localStorage.setItem('aiData_provider', state.provider);
     localStorage.setItem('aiData_tier', state.tier);
+    localStorage.setItem('aiData_language', state.language);
     localStorage.setItem('aiData_keys', JSON.stringify(state.keys));
     localStorage.setItem('aiData_custom', JSON.stringify(state.custom));
     localStorage.setItem('aiData_models', JSON.stringify(state.availableModels));
@@ -101,8 +106,13 @@ export function initChat() {
 
   modelPills.forEach(btn => {
     btn.addEventListener('click', () => {
-      state.tier = btn.dataset.tier;
+      if (btn.classList.contains('language-pill')) {
+        state.language = btn.dataset.lang;
+      } else {
+        state.tier = btn.dataset.tier;
+      }
       syncUIToState();
+      saveState();
     });
   });
 
@@ -260,7 +270,8 @@ export function initChat() {
         },
         state.custom,
         state.availableModels[state.provider] || [],
-        graphContext
+        graphContext,
+        state.language
       );
       
       messages.push({ role: 'assistant', content: aiResponseText });
@@ -275,7 +286,8 @@ export function initChat() {
          recentExchange, 
          EXTRACTION_PROMPT, 
          state.custom, 
-         state.availableModels[state.provider] || []
+         state.availableModels[state.provider] || [],
+         state.language
       ).then(jsonExtraction => {
          if(jsonExtraction) mergeKnowledge(jsonExtraction);
       }).catch(e => console.warn("Background extraction skipped."));
