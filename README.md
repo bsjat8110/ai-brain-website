@@ -2,6 +2,8 @@
 
 AI Brain is an experimental, next-generation AI research initiative designed to explore **persistent memory systems**, **autonomous agents**, and **long-term cognitive architectures**. Unlike traditional AI models that treat every interaction as a fresh start, AI Brain is built with an integrated localized knowledge graph that allows it to remember, learn, and evolve.
 
+**[🌐 Live Demo](https://ai-brain-website-ojoereu6n-bsjat8110s-projects.vercel.app/)**
+
 ## 🚀 Key Features
 
 - **Next-Gen AGI Search Console:** A high-speed, terminal-style search interface that simulates cognitive boot sequences and parses intention before execution.
