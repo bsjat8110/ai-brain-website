@@ -229,7 +229,14 @@ export function initChat() {
       <div class="chat-message__content">${formatMessage(content)}</div>
     `;
     chatMessages.appendChild(msg);
-    chatMessages.scrollTop = chatMessages.scrollHeight;
+    scrollToBottom();
+  }
+
+  function scrollToBottom() {
+    chatMessages.scrollTo({
+      top: chatMessages.scrollHeight,
+      behavior: 'smooth'
+    });
   }
 
   function formatMessage(text) {
@@ -343,9 +350,33 @@ export function initChat() {
       messages.pop(); // Revert user message to prevent breaking context window
       localStorage.setItem('aiData_history', JSON.stringify(messages)); // Sync erased context memory
     } finally {
-      chatMessages.scrollTop = chatMessages.scrollHeight;
+      scrollToBottom();
       isStreaming = false;
     }
+  }
+
+  // --- MOBILE KEYBOARD ADAPTATION ---
+  function handleVisualViewport() {
+    if (!window.visualViewport) return;
+    
+    const vv = window.visualViewport;
+    const offset = window.innerHeight - vv.height;
+    
+    // If keyboard is open (offset > 0), shift the input area up
+    const inputArea = document.querySelector('.chat-modal__input-area');
+    if (inputArea && chatModal.classList.contains('active')) {
+      if (offset > 50) {
+        inputArea.style.transform = `translateY(-${offset}px)`;
+      } else {
+        inputArea.style.transform = 'translateY(0)';
+      }
+      scrollToBottom();
+    }
+  }
+
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', handleVisualViewport);
+    window.visualViewport.addEventListener('scroll', handleVisualViewport);
   }
 
   // --- EVENTS ---
