@@ -745,6 +745,17 @@
   color: var(--color-accent-primary);
 }
 
+.hero__brain-container {
+  position: relative;
+  width: 100%;
+  max-width: 500px;
+  aspect-ratio: 1 / 1;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .cloud__visual {
   position: relative;
   width: 100%;
