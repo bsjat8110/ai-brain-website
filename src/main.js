@@ -7,6 +7,9 @@ import './styles/components.css';
 import './styles/sections.css';
 import './styles/responsive.css';
 
+import { injectSpeedInsights } from '@vercel/speed-insights';
+import { inject } from '@vercel/analytics';
+
 // import { initBrain3D } from './brain3d.js'; // Dynamically imported for performance
 import { initParticles } from './particles.js';
 import { initChat } from './chat.js';
@@ -16,6 +19,10 @@ import { initSystemMap } from './systemmap.js';
 import { initNetworkGlobe } from './networkglobe.js';
 import { initNavigation } from './navigation.js';
 import { initAGISearch } from './agisearch.js';
+
+// Initialize Vercel Monitoring
+injectSpeedInsights();
+inject();
 
 // Initialize everything when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
