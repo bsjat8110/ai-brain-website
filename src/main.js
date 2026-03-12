@@ -19,6 +19,8 @@ import { initSystemMap } from './systemmap.js';
 import { initNetworkGlobe } from './networkglobe.js';
 import { initNavigation } from './navigation.js';
 import { initAGISearch } from './agisearch.js';
+import { initBlog } from './blog.js';
+import './styles/blog.css';
 
 // Initialize Vercel Monitoring
 injectSpeedInsights();
@@ -40,6 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initArchitecture();
   initSystemMap();
   initNetworkGlobe();
+  initBlog();
 
 
 });
