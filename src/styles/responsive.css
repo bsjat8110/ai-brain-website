@@ -180,16 +180,62 @@
     padding-left: var(--space-8);
   }
 
+  .chat-modal {
+    padding: 0 !important;
+  }
+
   .chat-modal__container {
     max-width: 100vw;
     max-height: 100vh;
     height: 100vh;
+    height: 100dvh; /* Handles mobile browser UI dynamically */
     border-radius: 0;
     border: none;
+    background: var(--color-bg-main);
   }
 
-  .chat-modal {
-    padding: 0;
+  .chat-modal__header {
+    padding: var(--space-4);
+  }
+
+  .chat-modal__messages {
+    padding: var(--space-4) var(--space-4) var(--space-8) var(--space-4);
+    gap: var(--space-6);
+  }
+
+  .chat-message {
+    max-width: 95%;
+    gap: var(--space-3);
+  }
+
+  .chat-message__avatar {
+    width: 28px;
+    height: 28px;
+    font-size: 0.8rem;
+  }
+
+  .chat-message__content {
+    font-size: 0.9rem;
+    padding: var(--space-3) var(--space-4);
+  }
+
+  .chat-modal__input-area {
+    padding: var(--space-3) var(--space-4);
+    padding-bottom: calc(var(--space-3) + env(safe-area-inset-bottom));
+    background: var(--color-bg-secondary);
+  }
+
+  .chat-modal__input {
+    min-height: 48px;
+    font-size: 0.95rem;
+    padding: var(--space-3) var(--space-4);
+  }
+
+  .chat-modal__send {
+    width: 44px;
+    height: 44px;
+    font-size: 1rem;
+    margin-bottom: 2px;
   }
 
   /* AGI Search (Next-Gen) */

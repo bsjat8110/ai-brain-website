@@ -114,7 +114,7 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--color-accent-primary);
   margin-bottom: var(--space-6);
   backdrop-filter: var(--glass-blur);
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
@@ -134,8 +134,9 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .section__title {
-  font-size: clamp(2rem, 4vw, 3.25rem);
+  font-size: clamp(2.25rem, 5vw, 3.75rem);
   font-weight: var(--weight-extrabold);
+  letter-spacing: -0.02em;
   margin-bottom: var(--space-4);
   background: linear-gradient(135deg, #fff 0%, var(--color-accent-primary) 50%, var(--color-accent-secondary) 100%);
   -webkit-background-clip: text;

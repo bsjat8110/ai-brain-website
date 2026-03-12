@@ -5,10 +5,11 @@
 export function initAnimations() {
   // Intersection Observer for reveal animations
   const observer = new IntersectionObserver(
-    (entries) => {
+    (entries, observer) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
           entry.target.classList.add('visible');
+          observer.unobserve(entry.target); // Performance optimization: stop tracking once revealed
         }
       });
     },

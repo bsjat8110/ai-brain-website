@@ -265,6 +265,7 @@ export function initChat() {
     if (!text) return;
 
     chatInput.value = '';
+    chatInput.style.height = 'auto'; // Reset textarea height
     
     // Add User message
     messages.push({ role: 'user', content: text });
@@ -353,6 +354,13 @@ export function initChat() {
   chatClose.addEventListener('click', closeChat);
   chatClear.addEventListener('click', clearChat);
   chatSend.addEventListener('click', sendMessage);
+  
+  // Auto-resize textarea
+  chatInput.addEventListener('input', () => {
+    chatInput.style.height = 'auto';
+    chatInput.style.height = `${Math.min(chatInput.scrollHeight, 200)}px`;
+  });
+
   chatInput.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();

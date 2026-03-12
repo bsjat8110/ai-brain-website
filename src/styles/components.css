@@ -35,6 +35,11 @@
   opacity: 1;
 }
 
+.btn:active {
+  transform: translateY(0) scale(0.97) !important;
+  transition: var(--transition-fast);
+}
+
 .btn--primary {
   background: linear-gradient(135deg, var(--color-accent-primary), var(--color-accent-secondary));
   color: #fff;

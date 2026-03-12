@@ -9,18 +9,21 @@ export function initNavigation() {
 
   if (!nav) return;
 
-  // Scroll effect
-  let lastScroll = 0;
+  // Scroll effect (optimized with requestAnimationFrame)
+  let isScrolling = false;
   window.addEventListener('scroll', () => {
-    const scrollY = window.scrollY;
-
-    if (scrollY > 50) {
-      nav.classList.add('scrolled');
-    } else {
-      nav.classList.remove('scrolled');
+    if (!isScrolling) {
+      window.requestAnimationFrame(() => {
+        const scrollY = window.scrollY;
+        if (scrollY > 50) {
+          nav.classList.add('scrolled');
+        } else {
+          nav.classList.remove('scrolled');
+        }
+        isScrolling = false;
+      });
+      isScrolling = true;
     }
-
-    lastScroll = scrollY;
   });
 
   // Active section highlighting
