@@ -13,6 +13,29 @@ const PROXY_URL = 'https://api.rss2json.com/v1/api.json?rss_url=';
 const CACHE_KEY = 'ai_blog_cache';
 const CACHE_TIME = 8 * 60 * 60 * 1000; // 8 hours (3 updates daily)
 
+// --- XSS Protection Helpers ---
+function escapeHtml(str) {
+  if (typeof str !== 'string') return '';
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+function sanitizeUrl(url) {
+  try {
+    const parsed = new URL(url);
+    if (parsed.protocol === 'https:' || parsed.protocol === 'http:') {
+      return parsed.href;
+    }
+  } catch (_) {
+    // invalid URL
+  }
+  return '#';
+}
+
 export function initBlog() {
   const blogContainer = document.getElementById('ai-blog');
   if (!blogContainer) return;
@@ -91,18 +114,23 @@ function renderSkeleton(container) {
 function renderFeed(container, posts) {
   const gridHtml = posts.map(post => {
     const date = new Date(post.pubDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-    const excerpt = post.description.replace(/<[^>]*>/g, '').substring(0, 120) + '...';
+    // Strip HTML tags from description, then escape for safe rendering
+    const rawExcerpt = (post.description || '').replace(/<[^>]*>/g, '').substring(0, 120) + '...';
+    const excerpt = escapeHtml(rawExcerpt);
+    const title = escapeHtml(post.title);
+    const source = escapeHtml(post.source);
+    const safeLink = sanitizeUrl(post.link);
     
     return `
       <div class="blog-card reveal">
         <div class="blog-card__header">
-          <span class="blog-card__source">${post.source}</span>
-          <span class="blog-card__date">${date}</span>
+          <span class="blog-card__source">${source}</span>
+          <span class="blog-card__date">${escapeHtml(date)}</span>
         </div>
-        <h3 class="blog-card__title">${post.title}</h3>
+        <h3 class="blog-card__title">${title}</h3>
         <p class="blog-card__excerpt">${excerpt}</p>
         <div class="blog-card__footer">
-          <a href="${post.link}" target="_blank" class="blog-card__link">
+          <a href="${safeLink}" target="_blank" rel="noopener noreferrer" class="blog-card__link">
             Read Full Article
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M5 12h14M12 5l7 7-7 7"/>
