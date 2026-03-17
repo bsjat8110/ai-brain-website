@@ -22,40 +22,37 @@ const FALLBACK_CHAINS = {
 };
 
 /**
- * Fetch available models from the provider's /models API.
+ * Fetch available models from the provider.
+ * For server-side providers (gemini/openai/claude), validates via proxy and returns fallback defaults.
  */
 export async function fetchAvailableModels(provider, apiKey, customConfig = null) {
   try {
     if (provider === 'gemini') {
-      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
-      if (!res.ok) throw new Error("API Key validation failed");
-      const data = await res.json();
-      return data.models.map(m => m.name.replace('models/', '')).filter(m => m.includes('gemini'));
+      const res = await fetch('/api/gemini', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ model: PROVIDER_MODELS.gemini.fast, messages: [{ role: 'user', content: 'ping' }], stream: false }),
+      });
+      if (!res.ok) throw new Error("Gemini API key not configured on server. Set GEMINI_API_KEY in Vercel environment variables.");
+      return FALLBACK_CHAINS.gemini;
     } 
     else if (provider === 'openai') {
-      const res = await fetch('https://api.openai.com/v1/models', { headers: { 'Authorization': `Bearer ${apiKey}` }});
-      if (!res.ok) throw new Error("API Key validation failed");
-      const data = await res.json();
-      return data.data.map(m => m.id);
+      const res = await fetch('/api/openai', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ model: PROVIDER_MODELS.openai.fast, messages: [{ role: 'user', content: 'ping' }], stream: false }),
+      });
+      if (!res.ok) throw new Error("OpenAI API key not configured on server. Set OPENAI_API_KEY in Vercel environment variables.");
+      return FALLBACK_CHAINS.openai;
     } 
     else if (provider === 'claude') {
-      // Anthropic /v1/models might not be fully exposed for all keys inside browsers natively.
-      // We will perform a tiny validation request if models endpoint fails.
-      try {
-        const res = await fetch('https://api.anthropic.com/v1/models', {
-          headers: {
-            'x-api-key': apiKey,
-            'anthropic-version': '2023-06-01',
-            'anthropic-dangerously-allow-browser': 'true'
-          }
-        });
-        if (res.ok) {
-          const data = await res.json();
-          return data.data.map(m => m.id);
-        }
-      } catch (e) {}
-      // Silent fallback to standard models array if endpoint is restricted.
-      return ['claude-3-opus-20240229', 'claude-3-sonnet-20240229', 'claude-3-haiku-20240307', 'claude-3-5-sonnet-20240620'];
+      const res = await fetch('/api/claude', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ model: PROVIDER_MODELS.claude.fast, messages: [{ role: 'user', content: 'ping' }], stream: false }),
+      });
+      if (!res.ok) throw new Error("Anthropic API key not configured on server. Set ANTHROPIC_API_KEY in Vercel environment variables.");
+      return FALLBACK_CHAINS.claude;
     } 
     else if (provider === 'custom') {
       if (!customConfig || !customConfig.endpoint || !customConfig.model) throw new Error("Missing custom config");
@@ -72,17 +69,21 @@ export async function fetchAvailableModels(provider, apiKey, customConfig = null
       return [customConfig.model];
     }
   } catch (err) {
-    throw new Error(`Connection failed: Could not validate ${provider}. Check your API key. (${err.message})`);
+    throw new Error(`Connection failed: Could not validate ${provider}. ${err.message}`);
   }
 }
 
 /**
  * Validates connection before activating the provider in the settings.
+ * For server-side providers (gemini/openai/claude), validates via proxy (no browser-side key needed).
+ * For custom provider, apiKey is still required.
  */
 export async function validateProviderConnection(provider, apiKey, customConfig = null) {
-  if (!apiKey) throw new Error("API key is required.");
-  if (provider === 'custom' && (!customConfig || !customConfig.endpoint || !customConfig.model)) {
-    throw new Error("Custom provider requires an endpoint and a model name.");
+  if (provider === 'custom') {
+    if (!apiKey) throw new Error("API key is required for custom provider.");
+    if (!customConfig || !customConfig.endpoint || !customConfig.model) {
+      throw new Error("Custom provider requires an endpoint and a model name.");
+    }
   }
   
   const models = await fetchAvailableModels(provider, apiKey, customConfig);
@@ -120,9 +121,11 @@ export function getBestModelForTier(provider, tier, availableModels) {
 
 /**
  * Stream a response from the selected AI provider with self-healing fallback.
+ * For server-side providers (gemini/openai/claude), requests are proxied via /api/* endpoints.
+ * apiKey is only used for the custom provider.
  */
 export async function streamAIResponse(provider, tier, apiKey, messages, onChunk, customConfig = null, availableModels = [], memoryContext = '', languagePreference = 'auto', aiMode = 'normal') {
-  if (!apiKey) throw new Error(`Missing API Key for ${provider}. Please enter it in the settings.`);
+  if (provider === 'custom' && !apiKey) throw new Error(`Missing API Key for custom provider. Please enter it in the settings.`);
 
   let systemPrompt = "You are AI Brain, a highly advanced, persistent intelligence architecture designed to assist users with knowledge synthesis, autonomous action planning, and deep research." + memoryContext;
   
@@ -151,13 +154,13 @@ export async function streamAIResponse(provider, tier, apiKey, messages, onChunk
   
   const tryStream = async (modelToTry) => {
     if (provider === 'gemini') {
-      await streamGemini(modelToTry, apiKey, messages, systemPrompt, onChunk);
+      await streamGemini(modelToTry, messages, systemPrompt, onChunk);
     } else if (provider === 'openai') {
-      await streamOpenAI(modelToTry, apiKey, messages, systemPrompt, onChunk);
+      await streamOpenAI(modelToTry, messages, systemPrompt, onChunk);
     } else if (provider === 'claude') {
-      await streamClaude(modelToTry, apiKey, messages, systemPrompt, onChunk);
+      await streamClaude(modelToTry, messages, systemPrompt, onChunk);
     } else if (provider === 'custom') {
-      await streamOpenAI(modelToTry, apiKey, messages, systemPrompt, onChunk, customConfig.endpoint);
+      await streamCustom(modelToTry, apiKey, messages, systemPrompt, onChunk, customConfig.endpoint);
     }
   };
 
@@ -195,20 +198,19 @@ export async function streamAIResponse(provider, tier, apiKey, messages, onChunk
 
 /* --- PROVIDER STREAMING IMPLEMENTATIONS --- */
 
-async function streamGemini(model, apiKey, messages, systemPrompt, onChunk) {
-  const contents = messages.map(m => ({
-    role: m.role === 'assistant' ? 'model' : 'user',
-    parts: [{ text: m.content }]
-  }));
-  
-  contents.unshift({ role: "user", parts: [{ text: `SYSTEM DIRECTIVE: ${systemPrompt}` }] });
+async function streamGemini(model, messages, systemPrompt, onChunk) {
+  // Map 'assistant' → 'model' and filter out any 'system' roles — Gemini only accepts 'user' or 'model'
+  const normalizedMessages = messages
+    .filter(m => m.role === 'user' || m.role === 'assistant' || m.role === 'model')
+    .map(m => ({
+      role: m.role === 'assistant' ? 'model' : m.role,
+      content: m.content
+    }));
 
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:streamGenerateContent?key=${apiKey}&alt=sse`;
-  
-  const response = await fetch(url, {
+  const response = await fetch('/api/gemini', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ contents })
+    body: JSON.stringify({ model, messages: normalizedMessages, stream: true, systemPrompt })
   });
   
   if (!response.ok) throw new Error(`Gemini API Error: ${response.status} ${await response.text()}`);
@@ -238,15 +240,11 @@ async function streamGemini(model, apiKey, messages, systemPrompt, onChunk) {
   }
 }
 
-async function streamOpenAI(model, apiKey, messages, systemPrompt, onChunk, baseUrl = 'https://api.openai.com/v1/chat/completions') {
-  const formattedMessages = [{ role: 'system', content: systemPrompt }, ...messages];
-  const response = await fetch(baseUrl, {
+async function streamOpenAI(model, messages, systemPrompt, onChunk) {
+  const response = await fetch('/api/openai', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${apiKey}`
-    },
-    body: JSON.stringify({ model: model, messages: formattedMessages, stream: true })
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ model, messages, stream: true, systemPrompt })
   });
   if (!response.ok) throw new Error(`OpenAI API Error: ${response.status} ${await response.text()}`);
 
@@ -275,16 +273,11 @@ async function streamOpenAI(model, apiKey, messages, systemPrompt, onChunk, base
   }
 }
 
-async function streamClaude(model, apiKey, messages, systemPrompt, onChunk) {
-  const response = await fetch('https://api.anthropic.com/v1/messages', {
+async function streamClaude(model, messages, systemPrompt, onChunk) {
+  const response = await fetch('/api/claude', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': apiKey,
-      'anthropic-version': '2023-06-01',
-      'anthropic-dangerously-allow-browser': 'true'
-    },
-    body: JSON.stringify({ model: model, max_tokens: 1024, system: systemPrompt, messages, stream: true })
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ model, messages, stream: true, systemPrompt })
   });
   if (!response.ok) throw new Error(`Claude API Error: ${response.status} ${await response.text()}`);
 
@@ -313,13 +306,52 @@ async function streamClaude(model, apiKey, messages, systemPrompt, onChunk) {
   }
 }
 
+async function streamCustom(model, apiKey, messages, systemPrompt, onChunk, baseUrl) {
+  const formattedMessages = [{ role: 'system', content: systemPrompt }, ...messages];
+  const response = await fetch(baseUrl, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${apiKey}`
+    },
+    body: JSON.stringify({ model: model, messages: formattedMessages, stream: true })
+  });
+  if (!response.ok) throw new Error(`Custom API Error: ${response.status} ${await response.text()}`);
+
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder('utf-8');
+  let buffer = '';
+
+  while (true) {
+    const { value, done } = await reader.read();
+    if (done) break;
+    buffer += decoder.decode(value, { stream: true });
+    const lines = buffer.split('\n');
+    buffer = lines.pop();
+
+    for (const line of lines) {
+      if (line.startsWith('data: ')) {
+        const dataStr = line.slice(6);
+        if (dataStr === '[DONE]') continue;
+        try {
+          const data = JSON.parse(dataStr);
+          const chunkMatch = data.choices?.[0]?.delta?.content;
+          if (chunkMatch) onChunk(chunkMatch);
+        } catch (e) {}
+      }
+    }
+  }
+}
+
 /* --- BACKGROUND KNOWLEDGE EXTRACTION (NON-STREAMING) --- */
 
 /**
- * Non-streaming backend inference wrapper to run silent background tasks
+ * Non-streaming backend inference wrapper to run silent background tasks.
+ * For server-side providers (gemini/openai/claude), requests are proxied via /api/* endpoints.
+ * apiKey is only used for the custom provider.
  */
 export async function invokeAI(provider, tier, apiKey, messages, systemPrompt, customConfig = null, availableModels = [], languagePreference = 'auto', aiMode = 'normal') {
-  if (!apiKey) throw new Error(`Missing API Key for ${provider}.`);
+  if (provider === 'custom' && !apiKey) throw new Error(`Missing API Key for custom provider.`);
   
   let finalPrompt = systemPrompt;
   
@@ -337,41 +369,56 @@ export async function invokeAI(provider, tier, apiKey, messages, systemPrompt, c
   let targetModel = getBestModelForTier(provider, tier, availableModels);
   if (provider === 'custom') targetModel = customConfig.model;
 
-  // Find fallback if needed
   let modelToTry = targetModel;
 
   try {
     if (provider === 'gemini') {
-      const contents = messages.map(m => ({ role: m.role === 'assistant' ? 'model' : 'user', parts: [{ text: m.content }] }));
-      contents.unshift({ role: "user", parts: [{ text: `SYSTEM DIRECTIVE: ${finalPrompt}` }] });
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelToTry}:generateContent?key=${apiKey}`;
-      const response = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents }) });
-      if(!response.ok) return null;
+      // Map 'assistant' → 'model' and filter out 'system' roles — Gemini only accepts 'user' or 'model'
+      const normalizedMessages = messages
+        .filter(m => m.role === 'user' || m.role === 'assistant' || m.role === 'model')
+        .map(m => ({
+          role: m.role === 'assistant' ? 'model' : m.role,
+          content: m.content
+        }));
+      const response = await fetch('/api/gemini', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ model: modelToTry, messages: normalizedMessages, stream: false, systemPrompt: finalPrompt })
+      });
+      if (!response.ok) return null;
       const data = await response.json();
       return data.candidates?.[0]?.content?.parts?.[0]?.text || null;
       
-    } else if (provider === 'openai' || provider === 'custom') {
-      const baseUrl = provider === 'custom' ? customConfig.endpoint : 'https://api.openai.com/v1/chat/completions';
-      const formattedMessages = [{ role: 'system', content: finalPrompt }, ...messages];
-      const response = await fetch(baseUrl, {
+    } else if (provider === 'openai') {
+      const response = await fetch('/api/openai', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
-        body: JSON.stringify({ model: modelToTry, messages: formattedMessages })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ model: modelToTry, messages, stream: false, systemPrompt: finalPrompt })
       });
-      if(!response.ok) return null;
+      if (!response.ok) return null;
       const data = await response.json();
       return data.choices?.[0]?.message?.content || null;
       
     } else if (provider === 'claude') {
-      const formattedMessages = messages.map(m => ({ role: m.role, content: m.content }));
-      const response = await fetch('https://api.anthropic.com/v1/messages', {
+      const response = await fetch('/api/claude', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerously-allow-browser': 'true' },
-        body: JSON.stringify({ model: modelToTry, max_tokens: 1024, system: finalPrompt, messages: formattedMessages })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ model: modelToTry, messages, stream: false, systemPrompt: finalPrompt })
       });
-      if(!response.ok) return null;
+      if (!response.ok) return null;
       const data = await response.json();
       return data.content?.[0]?.text || null;
+
+    } else if (provider === 'custom') {
+      const formattedMessages = [{ role: 'system', content: finalPrompt }, ...messages];
+      const response = await fetch(customConfig.endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+        body: JSON.stringify({ model: modelToTry, messages: formattedMessages })
+      });
+      if (!response.ok) return null;
+      const data = await response.json();
+      return data.choices?.[0]?.message?.content || null;
     }
   } catch(e) {
     console.error(`[AI Router] Invoke AI failed for ${provider} with model ${modelToTry}:`, e);
