@@ -61,11 +61,8 @@ export function initChat() {
   function syncUIToState() {
     providerTabs.forEach(t => t.classList.toggle('active', t.dataset.provider === state.provider));
     modelPills.forEach(p => p.classList.toggle('active', p.dataset.tier === state.tier));
-    
-    // Sync dropdowns
     if (chatLangDropdown) chatLangDropdown.value = state.language;
     if (chatModeDropdown) chatModeDropdown.value = state.aiMode;
-    
     if (state.provider === 'custom') {
       customFields.classList.remove('hidden');
       customEndpointInput.value = state.custom.endpoint;
@@ -73,7 +70,6 @@ export function initChat() {
     } else {
       customFields.classList.add('hidden');
     }
-    
     apiKeyInput.value = state.keys[state.provider] || '';
     updateActiveModelIndicator();
   }
@@ -128,7 +124,7 @@ export function initChat() {
     chatModeDropdown.addEventListener('change', (e) => {
       state.aiMode = e.target.value;
       saveState();
-      clearChat(); // Wipe history so the new persona isn't confused by old chat blocks
+      clearChat();
     });
   }
 
@@ -138,27 +134,20 @@ export function initChat() {
       state.custom.endpoint = customEndpointInput.value.trim();
       state.custom.model = customModelInput.value.trim();
     }
-    
-    // UI Validation State
     connectBtn.textContent = 'Validating...';
     connectBtn.disabled = true;
     errorBox.classList.add('hidden');
-    
     try {
       const models = await validateProviderConnection(state.provider, key, state.provider === 'custom' ? state.custom : null);
-      
-      // Save valid state
       state.keys[state.provider] = key;
       state.availableModels[state.provider] = models;
       saveState();
-      
       connectBtn.textContent = '✓ Connected';
       setTimeout(() => {
         connectBtn.textContent = 'Connect Provider';
         connectBtn.disabled = false;
         settingsPanel.classList.remove('active');
       }, 1500);
-      
     } catch (err) {
       errorBox.textContent = err.message || 'Connection failed. Please check your configurations.';
       errorBox.classList.remove('hidden');
@@ -183,7 +172,7 @@ export function initChat() {
 
   function clearChat() {
     messages = [];
-    localStorage.removeItem('aiData_history'); // Wipe topic memory
+    localStorage.removeItem('aiData_history');
     chatMessages.innerHTML = `
       <div class="chat-modal__welcome">
         <span class="chat-modal__welcome-icon">🧠</span>
@@ -198,12 +187,8 @@ export function initChat() {
       clearChat();
       return;
     }
-    
-    // Clear welcome message before re-rendering history
     chatMessages.innerHTML = '';
-    
     messages.forEach(msg => {
-      // Create element directly without triggering auto-scroll or system checks
       const msgEl = document.createElement('div');
       msgEl.className = `chat-message chat-message--${msg.role === 'user' ? 'user' : 'ai'}`;
       msgEl.innerHTML = `
@@ -215,13 +200,11 @@ export function initChat() {
     chatMessages.scrollTop = chatMessages.scrollHeight;
   }
 
-  // Initial render when script loads
   renderHistory();
 
   function addMessageUI(content, isUser = false) {
     const welcome = chatMessages.querySelector('.chat-modal__welcome');
     if (welcome) welcome.remove();
-
     const msg = document.createElement('div');
     msg.className = `chat-message chat-message--${isUser ? 'user' : 'ai'}`;
     msg.innerHTML = `
@@ -239,29 +222,37 @@ export function initChat() {
     });
   }
 
+  // --- SECURITY: XSS Prevention — escape HTML before rendering AI/user content ---
+  function escapeHtml(text) {
+    return text
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
   function formatMessage(text) {
-    return text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+    // Step 1: Escape all HTML to block XSS injection from AI responses or user input
+    const escaped = escapeHtml(text);
+    // Step 2: Apply safe markdown-like formatting on the escaped text only
+    return escaped
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\n/g, '<br>');
   }
 
   // --- TOKEN COMPACTION ENGINE ---
   function compactHistory() {
-    // A rough estimation of tokens: length of stringified history / 4
     const historyString = JSON.stringify(messages);
     const estimatedTokens = historyString.length / 4;
-    
-    // Safety Threshold (e.g. 50,000 tokens for average model context safety limit)
     const TOKEN_LIMIT = 50000;
-    
     if (estimatedTokens > TOKEN_LIMIT) {
       console.warn(`[AI Router] Token limit approaching (${Math.round(estimatedTokens)}). Compacting history...`);
-      // Keep the most recent 10-20% of the conversation (approx last 4 messages) to maintain immediate context
       messages = messages.slice(-4);
       localStorage.setItem('aiData_history', JSON.stringify(messages));
-      
-      // Inject a subtle UI notice
       const notice = document.createElement('div');
       notice.className = 'chat-message chat-message--ai';
-      notice.innerHTML = `<span style="font-size: 0.8rem; color: var(--color-text-secondary); opacity: 0.7;">⚙️ System: Chat history compacted to preserve memory & context bounds.</span>`;
+      notice.innerHTML = `<span style=\"font-size: 0.8rem; color: var(--color-text-secondary); opacity: 0.7;\">⚙️ System: Chat history compacted to preserve memory & context bounds.</span>`;
       chatMessages.appendChild(notice);
     }
   }
@@ -272,23 +263,20 @@ export function initChat() {
     if (!text) return;
 
     chatInput.value = '';
-    chatInput.style.height = 'auto'; // Reset textarea height
-    
-    // Add User message
+    chatInput.style.height = 'auto';
     messages.push({ role: 'user', content: text });
-    localStorage.setItem('aiData_history', JSON.stringify(messages)); // Persist immediately
+    localStorage.setItem('aiData_history', JSON.stringify(messages));
     addMessageUI(text, true);
 
     const apiKey = state.keys[state.provider];
     if (!apiKey) {
       addMessageUI("⚠️ No API Key found for this provider. Please open Settings (⚙️) and add your key.", false);
-      messages.pop(); // Remove user message from history if failed
+      messages.pop();
       return;
     }
 
     isStreaming = true;
 
-    // AI message shell
     const msgEl = document.createElement('div');
     msgEl.className = 'chat-message chat-message--ai';
     msgEl.innerHTML = `
@@ -302,10 +290,7 @@ export function initChat() {
     let backgroundMemoryTask = null;
 
     try {
-      // 1. Compact History before Request
       compactHistory();
-      
-      // 2. Memory Context Retrieval (Silent keyword mapping before request)
       const graphContext = retrieveContext(text);
 
       await streamAIResponse(
@@ -326,9 +311,8 @@ export function initChat() {
       );
       
       messages.push({ role: 'assistant', content: aiResponseText });
-      localStorage.setItem('aiData_history', JSON.stringify(messages)); // Persist the completed AI response
+      localStorage.setItem('aiData_history', JSON.stringify(messages));
       
-      // Fire-and-forget background extraction onto localized memory (does not block user interaction)
       const recentExchange = messages.slice(-2);
       backgroundMemoryTask = invokeAI(
          state.provider, 
@@ -347,8 +331,8 @@ export function initChat() {
     } catch (err) {
       aiResponseText += `\n\n**Error:** ${err.message}`;
       contentEl.innerHTML = formatMessage(aiResponseText);
-      messages.pop(); // Revert user message to prevent breaking context window
-      localStorage.setItem('aiData_history', JSON.stringify(messages)); // Sync erased context memory
+      messages.pop();
+      localStorage.setItem('aiData_history', JSON.stringify(messages));
     } finally {
       scrollToBottom();
       isStreaming = false;
@@ -358,11 +342,8 @@ export function initChat() {
   // --- MOBILE KEYBOARD ADAPTATION ---
   function handleVisualViewport() {
     if (!window.visualViewport) return;
-    
     const vv = window.visualViewport;
     const offset = window.innerHeight - vv.height;
-    
-    // If keyboard is open (offset > 0), shift the input area up
     const inputArea = document.querySelector('.chat-modal__input-area');
     if (inputArea && chatModal.classList.contains('active')) {
       if (offset > 50) {
@@ -386,7 +367,6 @@ export function initChat() {
   chatClear.addEventListener('click', clearChat);
   chatSend.addEventListener('click', sendMessage);
   
-  // Auto-resize textarea
   chatInput.addEventListener('input', () => {
     chatInput.style.height = 'auto';
     chatInput.style.height = `${Math.min(chatInput.scrollHeight, 200)}px`;
