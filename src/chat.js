@@ -70,7 +70,28 @@ export function initChat() {
     } else {
       customFields.classList.add('hidden');
     }
-    apiKeyInput.value = state.keys[state.provider] || '';
+
+    const serverSideProviders = ['gemini', 'openai', 'claude'];
+    if (serverSideProviders.includes(state.provider)) {
+      // Hide API key input — key is configured server-side via environment variable
+      apiKeyInput.style.display = 'none';
+      let infoMsg = document.getElementById('provider-server-info');
+      if (!infoMsg) {
+        infoMsg = document.createElement('p');
+        infoMsg.id = 'provider-server-info';
+        infoMsg.style.cssText = 'font-size:0.8rem;color:var(--color-text-secondary);margin:0.5rem 0;';
+        apiKeyInput.parentNode.insertBefore(infoMsg, apiKeyInput.nextSibling);
+      }
+      infoMsg.textContent = 'API key is configured server-side. No key needed here.';
+      infoMsg.style.display = '';
+    } else {
+      // Custom provider — show API key input
+      apiKeyInput.style.display = '';
+      apiKeyInput.value = state.keys[state.provider] || '';
+      const infoMsg = document.getElementById('provider-server-info');
+      if (infoMsg) infoMsg.style.display = 'none';
+    }
+
     updateActiveModelIndicator();
   }
 
@@ -129,7 +150,7 @@ export function initChat() {
   }
 
   connectBtn.addEventListener('click', async () => {
-    const key = apiKeyInput.value.trim();
+    const key = apiKeyInput.value.trim(); // Only used for custom provider
     if (state.provider === 'custom') {
       state.custom.endpoint = customEndpointInput.value.trim();
       state.custom.model = customModelInput.value.trim();
@@ -138,8 +159,14 @@ export function initChat() {
     connectBtn.disabled = true;
     errorBox.classList.add('hidden');
     try {
-      const models = await validateProviderConnection(state.provider, key, state.provider === 'custom' ? state.custom : null);
-      state.keys[state.provider] = key;
+      const models = await validateProviderConnection(
+        state.provider,
+        state.provider === 'custom' ? key : '',
+        state.provider === 'custom' ? state.custom : null
+      );
+      if (state.provider === 'custom') {
+        state.keys[state.provider] = key;
+      }
       state.availableModels[state.provider] = models;
       saveState();
       connectBtn.textContent = '✓ Connected';
@@ -268,8 +295,9 @@ export function initChat() {
     localStorage.setItem('aiData_history', JSON.stringify(messages));
     addMessageUI(text, true);
 
-    const apiKey = state.keys[state.provider];
-    if (!apiKey) {
+    const serverSideProviders = ['gemini', 'openai', 'claude'];
+    const apiKey = state.keys[state.provider] || '';
+    if (!serverSideProviders.includes(state.provider) && !apiKey) {
       addMessageUI("⚠️ No API Key found for this provider. Please open Settings (⚙️) and add your key.", false);
       messages.pop();
       return;
