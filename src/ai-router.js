@@ -3,10 +3,11 @@
  * Handles intelligent routing, automatic model discovery, fallback resolution, and secure validation.
  */
 
+/** Phase 5: Fix 1 — Updated to latest stable model IDs */
 const PROVIDER_MODELS = { // Safe defaults
-  gemini: { fast: 'gemini-1.5-flash', medium: 'gemini-1.5-flash', pro: 'gemini-1.5-pro' },
-  openai: { fast: 'gpt-4o-mini', medium: 'gpt-3.5-turbo', pro: 'gpt-4o' },
-  claude: { fast: 'claude-3-haiku-20240307', medium: 'claude-3-sonnet-20240229', pro: 'claude-3-opus-20240229' }
+  gemini: { fast: 'gemini-2.0-flash', medium: 'gemini-2.0-flash', pro: 'gemini-1.5-pro' },
+  openai: { fast: 'gpt-4o-mini', medium: 'gpt-4o-mini', pro: 'gpt-4o' },
+  claude: { fast: 'claude-3-5-haiku-20241022', medium: 'claude-3-5-sonnet-20241022', pro: 'claude-3-opus-20240229' }
 };
 
 const TIER_MAPPING = {
@@ -16,9 +17,9 @@ const TIER_MAPPING = {
 };
 
 const FALLBACK_CHAINS = {
-  gemini: ['gemini-1.5-flash', 'gemini-1.5-flash-8b', 'gemini-pro', 'gemini-1.0-pro'],
-  openai: ['gpt-4o-mini', 'gpt-3.5-turbo', 'gpt-4o', 'gpt-4'],
-  claude: ['claude-3-haiku-20240307', 'claude-3-sonnet-20240229', 'claude-3-5-sonnet-20240620']
+  gemini: ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-1.5-flash-8b', 'gemini-1.5-pro'],
+  openai: ['gpt-4o-mini', 'gpt-4o', 'gpt-3.5-turbo'],
+  claude: ['claude-3-5-haiku-20241022', 'claude-3-5-sonnet-20241022', 'claude-3-opus-20240229']
 };
 
 /**
@@ -124,7 +125,8 @@ export function getBestModelForTier(provider, tier, availableModels) {
  * For server-side providers (gemini/openai/claude), requests are proxied via /api/* endpoints.
  * apiKey is only used for the custom provider.
  */
-export async function streamAIResponse(provider, tier, apiKey, messages, onChunk, customConfig = null, availableModels = [], memoryContext = '', languagePreference = 'auto', aiMode = 'normal') {
+/** Phase 5: Fix 2 — Added optional signal parameter for AbortController stream cancellation */
+export async function streamAIResponse(provider, tier, apiKey, messages, onChunk, customConfig = null, availableModels = [], memoryContext = '', languagePreference = 'auto', aiMode = 'normal', signal = null) {
   if (provider === 'custom' && !apiKey) throw new Error(`Missing API Key for custom provider. Please enter it in the settings.`);
 
   let systemPrompt = "You are AI Brain, a highly advanced, persistent intelligence architecture designed to assist users with knowledge synthesis, autonomous action planning, and deep research." + memoryContext;
@@ -154,13 +156,13 @@ export async function streamAIResponse(provider, tier, apiKey, messages, onChunk
   
   const tryStream = async (modelToTry) => {
     if (provider === 'gemini') {
-      await streamGemini(modelToTry, messages, systemPrompt, onChunk);
+      await streamGemini(modelToTry, messages, systemPrompt, onChunk, signal);
     } else if (provider === 'openai') {
-      await streamOpenAI(modelToTry, messages, systemPrompt, onChunk);
+      await streamOpenAI(modelToTry, messages, systemPrompt, onChunk, signal);
     } else if (provider === 'claude') {
-      await streamClaude(modelToTry, messages, systemPrompt, onChunk);
+      await streamClaude(modelToTry, messages, systemPrompt, onChunk, signal);
     } else if (provider === 'custom') {
-      await streamCustom(modelToTry, apiKey, messages, systemPrompt, onChunk, customConfig.endpoint);
+      await streamCustom(modelToTry, apiKey, messages, systemPrompt, onChunk, customConfig.endpoint, signal);
     }
   };
 
@@ -198,7 +200,8 @@ export async function streamAIResponse(provider, tier, apiKey, messages, onChunk
 
 /* --- PROVIDER STREAMING IMPLEMENTATIONS --- */
 
-async function streamGemini(model, messages, systemPrompt, onChunk) {
+/** Phase 5: Fix 2 — signal for AbortController; Fix 5 — user-friendly HTTP error messages */
+async function streamGemini(model, messages, systemPrompt, onChunk, signal) {
   // Map 'assistant' → 'model' and filter out any 'system' roles — Gemini only accepts 'user' or 'model'
   const normalizedMessages = messages
     .filter(m => m.role === 'user' || m.role === 'assistant' || m.role === 'model')
@@ -210,10 +213,21 @@ async function streamGemini(model, messages, systemPrompt, onChunk) {
   const response = await fetch('/api/gemini', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ model, messages: normalizedMessages, stream: true, systemPrompt })
+    body: JSON.stringify({ model, messages: normalizedMessages, stream: true, systemPrompt }),
+    signal
   });
   
-  if (!response.ok) throw new Error(`Gemini API Error: ${response.status} ${await response.text()}`);
+  if (!response.ok) {
+    if (response.status === 429) {
+      throw new Error(`Rate limit reached for Gemini. Please wait a moment and try again.`);
+    } else if (response.status === 401 || response.status === 403) {
+      throw new Error(`Authentication failed for Gemini. Please check your API key in settings.`);
+    } else if (response.status === 503 || response.status === 502) {
+      throw new Error(`Gemini service is temporarily unavailable. Please try again in a moment.`);
+    } else {
+      throw new Error(`Gemini API Error (${response.status}). Please try again.`);
+    }
+  }
 
   const reader = response.body.getReader();
   const decoder = new TextDecoder('utf-8');
@@ -240,13 +254,25 @@ async function streamGemini(model, messages, systemPrompt, onChunk) {
   }
 }
 
-async function streamOpenAI(model, messages, systemPrompt, onChunk) {
+/** Phase 5: Fix 2 — signal for AbortController; Fix 5 — user-friendly HTTP error messages */
+async function streamOpenAI(model, messages, systemPrompt, onChunk, signal) {
   const response = await fetch('/api/openai', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ model, messages, stream: true, systemPrompt })
+    body: JSON.stringify({ model, messages, stream: true, systemPrompt }),
+    signal
   });
-  if (!response.ok) throw new Error(`OpenAI API Error: ${response.status} ${await response.text()}`);
+  if (!response.ok) {
+    if (response.status === 429) {
+      throw new Error(`Rate limit reached for OpenAI. Please wait a moment and try again.`);
+    } else if (response.status === 401 || response.status === 403) {
+      throw new Error(`Authentication failed for OpenAI. Please check your API key in settings.`);
+    } else if (response.status === 503 || response.status === 502) {
+      throw new Error(`OpenAI service is temporarily unavailable. Please try again in a moment.`);
+    } else {
+      throw new Error(`OpenAI API Error (${response.status}). Please try again.`);
+    }
+  }
 
   const reader = response.body.getReader();
   const decoder = new TextDecoder('utf-8');
@@ -273,13 +299,25 @@ async function streamOpenAI(model, messages, systemPrompt, onChunk) {
   }
 }
 
-async function streamClaude(model, messages, systemPrompt, onChunk) {
+/** Phase 5: Fix 2 — signal for AbortController; Fix 5 — user-friendly HTTP error messages */
+async function streamClaude(model, messages, systemPrompt, onChunk, signal) {
   const response = await fetch('/api/claude', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ model, messages, stream: true, systemPrompt })
+    body: JSON.stringify({ model, messages, stream: true, systemPrompt }),
+    signal
   });
-  if (!response.ok) throw new Error(`Claude API Error: ${response.status} ${await response.text()}`);
+  if (!response.ok) {
+    if (response.status === 429) {
+      throw new Error(`Rate limit reached for Claude. Please wait a moment and try again.`);
+    } else if (response.status === 401 || response.status === 403) {
+      throw new Error(`Authentication failed for Claude. Please check your API key in settings.`);
+    } else if (response.status === 503 || response.status === 502) {
+      throw new Error(`Claude service is temporarily unavailable. Please try again in a moment.`);
+    } else {
+      throw new Error(`Claude API Error (${response.status}). Please try again.`);
+    }
+  }
 
   const reader = response.body.getReader();
   const decoder = new TextDecoder('utf-8');
@@ -306,7 +344,8 @@ async function streamClaude(model, messages, systemPrompt, onChunk) {
   }
 }
 
-async function streamCustom(model, apiKey, messages, systemPrompt, onChunk, baseUrl) {
+/** Phase 5: Fix 2 — signal for AbortController; Fix 5 — user-friendly HTTP error messages */
+async function streamCustom(model, apiKey, messages, systemPrompt, onChunk, baseUrl, signal) {
   const formattedMessages = [{ role: 'system', content: systemPrompt }, ...messages];
   const response = await fetch(baseUrl, {
     method: 'POST',
@@ -314,9 +353,20 @@ async function streamCustom(model, apiKey, messages, systemPrompt, onChunk, base
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${apiKey}`
     },
-    body: JSON.stringify({ model: model, messages: formattedMessages, stream: true })
+    body: JSON.stringify({ model: model, messages: formattedMessages, stream: true }),
+    signal
   });
-  if (!response.ok) throw new Error(`Custom API Error: ${response.status} ${await response.text()}`);
+  if (!response.ok) {
+    if (response.status === 429) {
+      throw new Error(`Rate limit reached for Custom API. Please wait a moment and try again.`);
+    } else if (response.status === 401 || response.status === 403) {
+      throw new Error(`Authentication failed for Custom API. Please check your API key in settings.`);
+    } else if (response.status === 503 || response.status === 502) {
+      throw new Error(`Custom API service is temporarily unavailable. Please try again in a moment.`);
+    } else {
+      throw new Error(`Custom API Error (${response.status}). Please try again.`);
+    }
+  }
 
   const reader = response.body.getReader();
   const decoder = new TextDecoder('utf-8');
