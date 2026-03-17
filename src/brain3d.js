@@ -464,13 +464,16 @@ export function initBrain3D() {
   brainGroup.add(sparks);
 
   // ═══════════════════════════════════════════
-  //  ANIMATION LOOP
+  //  ANIMATION LOOP — with visibility & intersection pause
   // ═══════════════════════════════════════════
 
   let time = 0;
+  let animFrameId = null;
+  let isPageVisible = !document.hidden;
+  let isCanvasVisible = true;
 
   function animate() {
-    requestAnimationFrame(animate);
+    animFrameId = requestAnimationFrame(animate);
     time += 0.006;
 
     // Update uniforms
@@ -512,7 +515,48 @@ export function initBrain3D() {
 
     renderer.render(scene, camera);
   }
-  animate();
+
+  function startLoop() {
+    if (!animFrameId && isPageVisible && isCanvasVisible) {
+      animate();
+    }
+  }
+
+  function stopLoop() {
+    if (animFrameId) {
+      cancelAnimationFrame(animFrameId);
+      animFrameId = null;
+    }
+  }
+
+  // ─── Page Visibility API: pause when tab is hidden ───
+  document.addEventListener('visibilitychange', () => {
+    isPageVisible = !document.hidden;
+    if (isPageVisible) {
+      startLoop();
+    } else {
+      stopLoop();
+    }
+  });
+
+  // ─── IntersectionObserver: pause when canvas is off-screen ───
+  const canvasObserver = new IntersectionObserver(
+    (entries) => {
+      entries.forEach(entry => {
+        isCanvasVisible = entry.isIntersecting;
+        if (isCanvasVisible) {
+          startLoop();
+        } else {
+          stopLoop();
+        }
+      });
+    },
+    { threshold: 0.05 }
+  );
+  canvasObserver.observe(canvas);
+
+  // Start initial loop
+  startLoop();
 
   // ─── Resize ───
   function onResize() {
