@@ -33,9 +33,32 @@ export function initChat() {
 
   if (!searchInput || !chatModal) return;
 
+  /** Phase 5: Fix 4 — Set ARIA attributes for screen reader accessibility */
+  chatModal.setAttribute('role', 'dialog');
+  chatModal.setAttribute('aria-modal', 'true');
+  chatModal.setAttribute('aria-label', 'AI Brain Chat');
+  if (chatInput) {
+    chatInput.setAttribute('aria-label', 'Type your message');
+    chatInput.setAttribute('aria-multiline', 'true');
+  }
+  if (chatSend) chatSend.setAttribute('aria-label', 'Send message');
+  if (chatClose) chatClose.setAttribute('aria-label', 'Close chat');
+  if (chatClear) chatClear.setAttribute('aria-label', 'Clear chat history');
+  if (settingsBtn) {
+    settingsBtn.setAttribute('aria-label', 'Open provider settings');
+    settingsBtn.setAttribute('aria-expanded', 'false');
+  }
+  if (chatMessages) {
+    chatMessages.setAttribute('role', 'log');
+    chatMessages.setAttribute('aria-live', 'polite');
+    chatMessages.setAttribute('aria-label', 'Chat messages');
+  }
+
   // --- STATE MANAGEMENT ---
   let messages = JSON.parse(localStorage.getItem('aiData_history') || '[]');
   let isStreaming = false;
+  /** Phase 5: Fix 2 — AbortController to cancel in-flight streams */
+  let currentAbortController = null;
 
   let state = {
     provider: localStorage.getItem('aiData_provider') || 'gemini',
@@ -108,7 +131,9 @@ export function initChat() {
 
   // --- PANEL UI EVENTS ---
   settingsBtn.addEventListener('click', () => {
-    settingsPanel.classList.toggle('active');
+    const isNowActive = settingsPanel.classList.toggle('active');
+    /** Phase 5: Fix 4 — Keep aria-expanded in sync with panel open/close state */
+    settingsBtn.setAttribute('aria-expanded', isNowActive ? 'true' : 'false');
     errorBox.classList.add('hidden');
     syncUIToState();
   });
@@ -192,8 +217,14 @@ export function initChat() {
   }
 
   function closeChat() {
+    /** Phase 5: Fix 2 — Cancel any in-flight stream when chat modal closes */
+    if (currentAbortController) {
+      currentAbortController.abort();
+      currentAbortController = null;
+    }
     chatModal.classList.remove('active');
     settingsPanel.classList.remove('active');
+    if (settingsBtn) settingsBtn.setAttribute('aria-expanded', 'false');
     document.body.style.overflow = '';
   }
 
@@ -304,6 +335,9 @@ export function initChat() {
     }
 
     isStreaming = true;
+    /** Phase 5: Fix 2 — Create AbortController for this stream; abort on modal close or new Stop request */
+    currentAbortController = new AbortController();
+    const signal = currentAbortController.signal;
 
     const msgEl = document.createElement('div');
     msgEl.className = 'chat-message chat-message--ai';
@@ -335,7 +369,8 @@ export function initChat() {
         state.availableModels[state.provider] || [],
         graphContext,
         state.language,
-        state.aiMode
+        state.aiMode,
+        signal
       );
       
       messages.push({ role: 'assistant', content: aiResponseText });
@@ -357,13 +392,17 @@ export function initChat() {
       }).catch(e => console.warn("Background extraction skipped."));
 
     } catch (err) {
-      aiResponseText += `\n\n**Error:** ${err.message}`;
-      contentEl.innerHTML = formatMessage(aiResponseText);
-      messages.pop();
-      localStorage.setItem('aiData_history', JSON.stringify(messages));
+      /** Phase 5: Fix 2 — Silently ignore stream cancellation; do not show error to user */
+      if (err.name !== 'AbortError') {
+        aiResponseText += `\n\n**Error:** ${err.message}`;
+        contentEl.innerHTML = formatMessage(aiResponseText);
+        messages.pop();
+        localStorage.setItem('aiData_history', JSON.stringify(messages));
+      }
     } finally {
       scrollToBottom();
       isStreaming = false;
+      currentAbortController = null;
     }
   }
 

@@ -101,16 +101,26 @@ export function mergeKnowledge(jsonString) {
     let memory = getMemory();
 
     if (extraction.facts && Array.isArray(extraction.facts)) {
-      memory.facts = [...new Set([...memory.facts, ...extraction.facts])].slice(-MAX_FACTS);
+      /** Phase 5: Fix 6 — Filter facts to valid strings ≤ 200 chars to prevent localStorage bloat */
+      const validFacts = extraction.facts.filter(f => typeof f === 'string' && f.length <= 200);
+      memory.facts = [...new Set([...memory.facts, ...validFacts])].slice(-MAX_FACTS);
     }
     if (extraction.topics && Array.isArray(extraction.topics)) {
-      memory.topics = [...new Set([...memory.topics, ...extraction.topics])].slice(-20);
+      /** Phase 5: Fix 6 — Filter topics to valid strings ≤ 50 chars to prevent localStorage bloat */
+      const validTopics = extraction.topics.filter(t => typeof t === 'string' && t.length <= 50);
+      memory.topics = [...new Set([...memory.topics, ...validTopics])].slice(-20);
     }
     if (extraction.graph && Array.isArray(extraction.graph)) {
         // Unique edges based on subject+predicate+object
         const existingEdges = new Set(memory.knowledgeGraph.map(e => `${e.subject}|${e.predicate}|${e.object}`));
         extraction.graph.forEach(edge => {
-            if (edge.subject && edge.predicate && edge.object) {
+            /** Phase 5: Fix 6 — Validate graph edge fields are strings and each ≤ 100 chars */
+            if (
+              edge.subject && edge.predicate && edge.object &&
+              typeof edge.subject === 'string' && edge.subject.length <= 100 &&
+              typeof edge.predicate === 'string' && edge.predicate.length <= 100 &&
+              typeof edge.object === 'string' && edge.object.length <= 100
+            ) {
                 const key = `${edge.subject}|${edge.predicate}|${edge.object}`;
                 if (!existingEdges.has(key)) {
                     memory.knowledgeGraph.push(edge);

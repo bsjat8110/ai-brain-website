@@ -6,6 +6,17 @@
  * Initializes the AGI Search Terminal on the landing page.
  * Provides a simulated "cognitive boot" sequence before opening the chat.
  */
+
+/** Phase 5: Fix 3 — Local escapeHtml to prevent XSS from user query in log terminal */
+function escapeHtml(str) {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
 export function initAGISearch() {
   const searchInput = document.getElementById('agi-search-input');
   const searchBtn = document.getElementById('agi-search-btn');
@@ -29,7 +40,8 @@ export function initAGISearch() {
     const logs = [
       { text: 'Initializing neural handshake...', type: 'primary' },
       { text: 'Connecting to Global Knowledge Graph (2.4B nodes)...', type: 'secondary' },
-      { text: 'Parsing query intent: "' + query + '"', type: 'primary' },
+      /** Phase 5: Fix 3 — Escape query before embedding in log text to prevent XSS */
+      { text: 'Parsing query intent: "' + escapeHtml(query) + '"', type: 'primary' },
       { text: 'Cross-referencing persistent memory buffers...', type: 'secondary' },
       { text: 'Optimizing cognitive routing via Gemini 1.5 Pro...', type: 'primary' },
       { text: 'Brain synthesis complete. Establishing secure tunnel...', type: 'success' }
@@ -39,10 +51,15 @@ export function initAGISearch() {
       const timestamp = new Date().toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
       const entry = document.createElement('div');
       entry.className = `log-entry ${log.type}`;
-      entry.innerHTML = `
-        <span class="log-timestamp">[${timestamp}]</span>
-        <span class="log-text">${log.text}</span>
-      `;
+      /** Phase 5: Fix 3 — Use textContent for log text to prevent XSS via innerHTML */
+      const timestampSpan = document.createElement('span');
+      timestampSpan.className = 'log-timestamp';
+      timestampSpan.textContent = `[${timestamp}]`;
+      const logTextSpan = document.createElement('span');
+      logTextSpan.className = 'log-text';
+      logTextSpan.textContent = log.text;
+      entry.appendChild(timestampSpan);
+      entry.appendChild(logTextSpan);
       outputLog.appendChild(entry);
       
       // Auto-scroll
