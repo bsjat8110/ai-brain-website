@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180" width="180" height="180">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0a0a0f"/>
+      <stop offset="100%" style="stop-color:#0d0d1a"/>
+    </linearGradient>
+    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#a78bfa"/>
+      <stop offset="100%" style="stop-color:#60a5fa"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="45%" r="50%">
+      <stop offset="0%" style="stop-color:#a78bfa;stop-opacity:0.2"/>
+      <stop offset="100%" style="stop-color:#a78bfa;stop-opacity:0"/>
+    </radialGradient>
+  </defs>
+  <rect width="180" height="180" rx="40" fill="url(#bg)"/>
+  <ellipse cx="90" cy="85" rx="70" ry="60" fill="url(#glow)"/>
+  <!-- Large brain nodes -->
+  <circle cx="62"  cy="62"  r="16" fill="url(#g)" opacity="0.9"/>
+  <circle cx="118" cy="62"  r="16" fill="url(#g)" opacity="0.9"/>
+  <circle cx="90"  cy="110" r="16" fill="url(#g)" opacity="0.9"/>
+  <circle cx="38"  cy="110" r="10" fill="url(#g)" opacity="0.5"/>
+  <circle cx="142" cy="110" r="10" fill="url(#g)" opacity="0.5"/>
+  <!-- Connections -->
+  <line x1="62"  y1="62"  x2="118" y2="62"  stroke="url(#g)" stroke-width="4" stroke-linecap="round"/>
+  <line x1="62"  y1="62"  x2="90"  y2="110" stroke="url(#g)" stroke-width="4" stroke-linecap="round"/>
+  <line x1="118" y1="62"  x2="90"  y2="110" stroke="url(#g)" stroke-width="4" stroke-linecap="round"/>
+  <line x1="62"  y1="62"  x2="38"  y2="110" stroke="url(#g)" stroke-width="2.5" stroke-linecap="round" opacity="0.5"/>
+  <line x1="118" y1="62"  x2="142" y2="110" stroke="url(#g)" stroke-width="2.5" stroke-linecap="round" opacity="0.5"/>
+  <!-- Text -->
+  <text x="90" y="155" font-family="Inter, system-ui, sans-serif" font-weight="700" font-size="16" fill="white" text-anchor="middle" letter-spacing="2">AI BRAIN</text>
+</svg>
