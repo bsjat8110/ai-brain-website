@@ -13,7 +13,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" media="print" onload="this.media='all'">
+  <!-- Font loaded normally (media=print + onload trick removed — violated CSP; preload above handles async loading) -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap">
 
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="website" />
@@ -520,7 +521,7 @@
         <span class="whitepaper__icon">📄</span>
         <h3 class="whitepaper__title">AI Brain:</h3>
         <p class="whitepaper__subtitle">Persistent Memory for Autonomous Intelligence</p>
-        <a href="#" class="btn btn--secondary btn--lg" onclick="event.preventDefault()">Download Whitepaper (Coming Soon)</a>
+        <a href="#" class="btn btn--secondary btn--lg btn--disabled" id="whitepaper-btn" aria-disabled="true" tabindex="-1" style="pointer-events:none; opacity:0.6; cursor:not-allowed;">Download Whitepaper (Coming Soon)</a>
       </div>
     </div>
   </section>
@@ -555,9 +556,9 @@
         <h2 class="section__title">Early Access Waitlist</h2>
         <p class="section__subtitle">Be among the first to experience persistent AI intelligence. Sign up for early access to the AI Brain platform.</p>
       </div>
-      <form class="waitlist__form reveal" onsubmit="event.preventDefault(); this.querySelector('button').textContent='✓ Joined!'; this.querySelector('button').disabled=true;">
+      <form class="waitlist__form reveal" id="waitlist-form">
         <input type="email" class="waitlist__input" placeholder="Enter your email address" required />
-        <button type="submit" class="btn btn--primary btn--lg">Join Waitlist</button>
+        <button type="submit" class="btn btn--primary btn--lg" id="waitlist-btn">Join Waitlist</button>
       </form>
     </div>
   </section>

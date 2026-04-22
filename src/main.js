@@ -44,5 +44,14 @@ document.addEventListener('DOMContentLoaded', () => {
   initNetworkGlobe();
   initBlog();
 
-
+  // ── Waitlist Form Handler (inline onsubmit हटाया — CSP fix) ──
+  const waitlistForm = document.getElementById('waitlist-form');
+  const waitlistBtn = document.getElementById('waitlist-btn');
+  if (waitlistForm && waitlistBtn) {
+    waitlistForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      waitlistBtn.textContent = '✓ Joined!';
+      waitlistBtn.disabled = true;
+    });
+  }
 });
