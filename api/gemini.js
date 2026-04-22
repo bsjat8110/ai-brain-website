@@ -1,5 +1,5 @@
 // api/gemini.js — Vercel Serverless Function: Gemini Proxy
-export const config = { runtime: 'edge' };
+// Fluid Compute (default) — Edge runtime deprecated, Fluid has full Node.js + same regions/price
 
 export default async function handler(req) {
   if (req.method !== 'POST') {
@@ -63,7 +63,7 @@ export default async function handler(req) {
       status: upstream.status,
       headers: {
         'Content-Type': contentType,
-        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Origin': 'https://aibrainstartup.com',
       },
     });
   } catch (err) {

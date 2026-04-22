@@ -3,22 +3,23 @@
  * Handles intelligent routing, automatic model discovery, fallback resolution, and secure validation.
  */
 
-const PROVIDER_MODELS = { // Safe defaults
-  gemini: { fast: 'gemini-1.5-flash', medium: 'gemini-1.5-flash', pro: 'gemini-1.5-pro' },
-  openai: { fast: 'gpt-4o-mini', medium: 'gpt-3.5-turbo', pro: 'gpt-4o' },
-  claude: { fast: 'claude-3-haiku-20240307', medium: 'claude-3-sonnet-20240229', pro: 'claude-3-opus-20240229' }
+const PROVIDER_MODELS = { // Safe defaults — updated April 2026
+  gemini: { fast: 'gemini-2.0-flash', medium: 'gemini-2.0-flash', pro: 'gemini-2.5-pro-preview-03-25' },
+  openai: { fast: 'gpt-4o-mini', medium: 'gpt-4o', pro: 'gpt-4o' },
+  claude: { fast: 'claude-3-5-haiku-20241022', medium: 'claude-3-5-sonnet-20241022', pro: 'claude-3-5-sonnet-20241022' }
 };
 
 const TIER_MAPPING = {
-  gemini: { fast: ['flash-8b', 'flash'], medium: ['flash', 'pro'], pro: ['pro'] },
+  gemini: { fast: ['flash-8b', 'flash', '2.0-flash'], medium: ['flash', 'pro', '2.0-flash'], pro: ['2.5-pro', 'pro'] },
   openai: { fast: ['gpt-4o-mini', 'gpt-3.5'], medium: ['gpt-4-turbo', 'gpt-4o-mini'], pro: ['gpt-4o', 'gpt-4'] },
   claude: { fast: ['haiku'], medium: ['sonnet'], pro: ['opus', 'sonnet'] }
 };
 
 const FALLBACK_CHAINS = {
-  gemini: ['gemini-1.5-flash', 'gemini-1.5-flash-8b', 'gemini-pro', 'gemini-1.0-pro'],
-  openai: ['gpt-4o-mini', 'gpt-3.5-turbo', 'gpt-4o', 'gpt-4'],
-  claude: ['claude-3-haiku-20240307', 'claude-3-sonnet-20240229', 'claude-3-5-sonnet-20240620']
+  gemini: ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-1.5-flash-8b', 'gemini-1.0-pro'],
+  openai: ['gpt-4o-mini', 'gpt-4o', 'gpt-3.5-turbo'],
+  // Updated April 2026: claude-3-5-haiku/sonnet are current stable models
+  claude: ['claude-3-5-haiku-20241022', 'claude-3-5-sonnet-20241022', 'claude-3-haiku-20240307']
 };
 
 /**

@@ -6,7 +6,9 @@ const RSS_FEEDS = [
   { name: 'OpenAI', url: 'https://openai.com/news/rss.xml' },
   { name: 'DeepMind', url: 'https://deepmind.google/blog/rss.xml' },
   { name: 'NVIDIA', url: 'https://blogs.nvidia.com/blog/category/deep-learning/feed/' },
-  { name: 'Meta AI', url: 'https://about.fb.com/news/category/technology/artificial-intelligence/feed/' }
+  // Meta AI feed removed — was returning 500 errors
+  // Anthropic blog added as replacement
+  { name: 'Anthropic', url: 'https://www.anthropic.com/rss.xml' }
 ];
 
 const PROXY_URL = 'https://api.rss2json.com/v1/api.json?rss_url=';
