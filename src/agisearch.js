@@ -2,6 +2,17 @@
    AI BRAIN — AGI Search Terminal Simulation
    ═══════════════════════════════════════════════════════════ */
 
+// Escape user input before injecting into innerHTML — prevents XSS
+function escapeHtml(str) {
+  if (typeof str !== 'string') return '';
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
 /**
  * Initializes the AGI Search Terminal on the landing page.
  * Provides a simulated "cognitive boot" sequence before opening the chat.
@@ -29,9 +40,9 @@ export function initAGISearch() {
     const logs = [
       { text: 'Initializing neural handshake...', type: 'primary' },
       { text: 'Connecting to Global Knowledge Graph (2.4B nodes)...', type: 'secondary' },
-      { text: 'Parsing query intent: "' + query + '"', type: 'primary' },
+      { text: 'Parsing query intent: "' + escapeHtml(query) + '"', type: 'primary' },
       { text: 'Cross-referencing persistent memory buffers...', type: 'secondary' },
-      { text: 'Optimizing cognitive routing via Gemini 1.5 Pro...', type: 'primary' },
+      { text: 'Optimizing cognitive routing via AI Brain Neural Engine...', type: 'primary' },
       { text: 'Brain synthesis complete. Establishing secure tunnel...', type: 'success' }
     ];
 
