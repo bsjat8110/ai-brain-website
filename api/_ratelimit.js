@@ -89,11 +89,13 @@ export function rateLimitResponse(resetAt) {
   );
 }
 
-/** Returns the client IP from Vercel request headers */
+/** Returns the client IP from Vercel request headers.
+ *  Vercel Node.js runtime: req.headers is a plain object (not Web Fetch Headers),
+ *  so we use bracket notation, not .get(). */
 export function getClientIp(req) {
-  return (
-    req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
-    req.headers.get('x-real-ip') ||
-    'unknown'
-  );
+  const forwarded = req.headers['x-forwarded-for'] || req.headers['x-real-ip'];
+  if (typeof forwarded === 'string') {
+    return forwarded.split(',')[0].trim();
+  }
+  return 'unknown';
 }
