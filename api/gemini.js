@@ -31,9 +31,12 @@ export default async function handler(req) {
     });
   }
 
+  // Vercel Node.js runtime: body is pre-parsed on req.body (not req.json())
+  // req.json() is a Web Fetch API method that hangs in the Node.js runtime.
   let body;
   try {
-    body = await req.json();
+    body = req.body !== undefined ? req.body : await req.json();
+    if (typeof body === 'string') body = JSON.parse(body);
   } catch {
     return new Response(JSON.stringify({ error: 'Invalid JSON body' }), {
       status: 400,
