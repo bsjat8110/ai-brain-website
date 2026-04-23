@@ -82,7 +82,7 @@
   --space-24: 6rem;
   --space-32: 8rem;
 
-  --section-gap: clamp(5rem, 10vh, 8rem);
+  --section-gap: clamp(4rem, 8vh, 6rem);
   --container-max: 1200px;
   --container-narrow: 900px;
   --container-wide: 1400px;

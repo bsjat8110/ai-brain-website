@@ -98,22 +98,35 @@
             <span class="hero__title-gradient">AI Brain</span>
           </h1>
           <p class="hero__subtitle">Building Persistent Artificial Intelligence</p>
-          <!-- Removed research initiative text as requested -->
+          <p class="hero__description">AI that remembers everything, learns continuously, and acts autonomously — a cognitive system that evolves with every interaction.</p>
           <div class="hero__actions">
-            <a href="#waitlist" class="btn btn--primary btn--lg">Try AI Brain</a>
+            <a href="#waitlist" class="btn btn--primary btn--lg hero__cta-main">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              Get Early Access
+            </a>
             <a href="#architecture" class="btn btn--secondary btn--lg">View Architecture</a>
-            <a href="#research" class="btn btn--outline btn--lg">Read Research</a>
+          </div>
+          <div class="hero__trust">
+            <span class="hero__trust-text">Trusted by early researchers</span>
+            <div class="hero__trust-avatars">
+              <span class="avatar-dot" style="background:#00d4ff"></span>
+              <span class="avatar-dot" style="background:#7b61ff"></span>
+              <span class="avatar-dot" style="background:#00ffa3"></span>
+              <span class="avatar-dot" style="background:#ff6b35"></span>
+              <span class="avatar-dot" style="background:#ff3d8e"></span>
+            </div>
+            <span class="hero__trust-count">500+ on waitlist</span>
           </div>
           <div class="hero__stats">
-            <div>
-              <div class="hero__stat-value">5+</div>
-              <div class="hero__stat-label">Research Areas</div>
+            <div class="hero__stat-item">
+              <div class="hero__stat-value" data-count="3">3</div>
+              <div class="hero__stat-label">AI Models</div>
             </div>
-            <div>
+            <div class="hero__stat-item">
               <div class="hero__stat-value">∞</div>
               <div class="hero__stat-label">Memory Capacity</div>
             </div>
-            <div>
+            <div class="hero__stat-item">
               <div class="hero__stat-value">24/7</div>
               <div class="hero__stat-label">Agent Runtime</div>
             </div>
@@ -121,11 +134,52 @@
         </div>
         <div class="hero__visual">
           <div class="hero__brain-container">
+            <div class="hero__visual-glow"></div>
             <canvas id="hero-brain-canvas"></canvas>
             <div class="hero__brain-ring hero__brain-ring--1"></div>
             <div class="hero__brain-ring hero__brain-ring--2"></div>
             <div class="hero__brain-ring hero__brain-ring--3"></div>
+            <!-- Floating stat chips -->
+            <div class="hero__chip hero__chip--1">
+              <span class="chip-dot chip-dot--green"></span>
+              <span>Memory Active</span>
+            </div>
+            <div class="hero__chip hero__chip--2">
+              <span class="chip-dot chip-dot--blue"></span>
+              <span>5 Agents Running</span>
+            </div>
+            <div class="hero__chip hero__chip--3">
+              <span class="chip-dot chip-dot--purple"></span>
+              <span>Learning...</span>
+            </div>
           </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════ SOCIAL PROOF BAR ═══════════ -->
+  <section class="social-proof" id="social-proof">
+    <div class="container">
+      <div class="social-proof__inner reveal">
+        <div class="social-proof__item">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <span>End-to-end encrypted memory</span>
+        </div>
+        <div class="social-proof__divider"></div>
+        <div class="social-proof__item">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <span>Real-time 24/7 agent runtime</span>
+        </div>
+        <div class="social-proof__divider"></div>
+        <div class="social-proof__item">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          <span>Multi-model AI (GPT-4, Claude, Gemini)</span>
+        </div>
+        <div class="social-proof__divider"></div>
+        <div class="social-proof__item">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <span>500+ researchers on waitlist</span>
         </div>
       </div>
     </div>
@@ -424,7 +478,7 @@
   <section class="section" id="cloud">
     <div class="container">
       <div class="section__header reveal">
-        <span class="badge-dot"></span> Infrastructure</span>
+        <span class="section__badge"><span class="badge-dot"></span> Infrastructure</span>
         <h2 class="section__title">AI Brain Cloud</h2>
         <p class="section__subtitle">Distributed infrastructure for persistent memory and autonomous agents at scale.</p>
       </div>
@@ -555,16 +609,26 @@
 
   <!-- ═══════════ WAITLIST ═══════════ -->
   <section class="waitlist section" id="waitlist">
+    <div class="waitlist__bg-glow"></div>
     <div class="container">
       <div class="section__header reveal">
         <span class="section__badge"><span class="badge-dot"></span> Join Us</span>
-        <h2 class="section__title">Early Access Waitlist</h2>
-        <p class="section__subtitle">Be among the first to experience persistent AI intelligence. Sign up for early access to the AI Brain platform.</p>
+        <h2 class="section__title">Get Early Access</h2>
+        <p class="section__subtitle">Join 500+ researchers and builders on the waitlist. Be the first to experience persistent AI intelligence.</p>
       </div>
-      <form class="waitlist__form reveal" id="waitlist-form">
-        <input type="email" class="waitlist__input" placeholder="Enter your email address" required />
-        <button type="submit" class="btn btn--primary btn--lg" id="waitlist-btn">Join Waitlist</button>
-      </form>
+      <div class="waitlist__card reveal">
+        <form class="waitlist__form" id="waitlist-form">
+          <div class="waitlist__input-wrap">
+            <svg class="waitlist__icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            <input type="email" class="waitlist__input" placeholder="Enter your email address" required />
+          </div>
+          <button type="submit" class="btn btn--primary btn--lg waitlist__submit" id="waitlist-btn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            Join Waitlist
+          </button>
+        </form>
+        <p class="waitlist__note">No spam. Free forever for early members. Unsubscribe anytime.</p>
+      </div>
     </div>
   </section>
 

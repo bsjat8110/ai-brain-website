@@ -156,6 +156,28 @@
     flex-direction: column;
   }
 
+  .waitlist__card {
+    padding: var(--space-8) var(--space-6);
+  }
+
+  .social-proof__inner {
+    flex-direction: column;
+    gap: var(--space-4);
+    align-items: flex-start;
+  }
+
+  .social-proof__divider {
+    display: none;
+  }
+
+  .hero__chip {
+    display: none;
+  }
+
+  .hero__trust {
+    justify-content: center;
+  }
+
   .footer__content {
     justify-content: center;
     text-align: center;
