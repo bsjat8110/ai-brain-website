@@ -101,46 +101,68 @@
   overflow: hidden;
 }
 
+/* Glowing top-border accent on hover */
 .card::before {
   content: '';
   position: absolute;
   top: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--color-accent-primary), transparent);
+  left: 10%;
+  right: 10%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--color-accent-primary), var(--color-accent-secondary), transparent);
   opacity: 0;
-  transition: var(--transition-base);
+  transition: opacity var(--transition-base);
+  border-radius: 0 0 2px 2px;
+}
+
+/* Inner glow on hover */
+.card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 0%, rgba(0,212,255,0.05) 0%, transparent 60%);
+  opacity: 0;
+  transition: opacity var(--transition-base);
+  pointer-events: none;
 }
 
 .card:hover {
-  border-color: var(--color-border-hover);
+  border-color: rgba(0, 212, 255, 0.2);
   background: var(--color-bg-card-hover);
-  box-shadow: var(--shadow-card-hover);
-  transform: translateY(-4px);
+  box-shadow:
+    0 8px 40px rgba(0, 0, 0, 0.4),
+    0 0 30px rgba(0, 212, 255, 0.1),
+    0 1px 0 rgba(0, 212, 255, 0.2) inset;
+  transform: translateY(-5px);
 }
 
 .card:hover::before {
-  opacity: 0.6;
+  opacity: 1;
+}
+
+.card:hover::after {
+  opacity: 1;
 }
 
 .card__icon {
-  width: 48px;
-  height: 48px;
+  width: 52px;
+  height: 52px;
   border-radius: var(--radius-md);
   background: linear-gradient(135deg, rgba(0, 212, 255, 0.12), rgba(123, 97, 255, 0.12));
-  border: 1px solid rgba(0, 212, 255, 0.15);
+  border: 1px solid rgba(0, 212, 255, 0.18);
   display: flex;
   align-items: center;
   justify-content: center;
   margin-bottom: var(--space-5);
-  font-size: 1.4rem;
+  font-size: 1.5rem;
   transition: var(--transition-base);
 }
 
 .card:hover .card__icon {
-  box-shadow: var(--shadow-glow-sm);
-  border-color: rgba(0, 212, 255, 0.35);
+  background: linear-gradient(135deg, rgba(0, 212, 255, 0.2), rgba(123, 97, 255, 0.2));
+  box-shadow: 0 0 20px rgba(0, 212, 255, 0.25);
+  border-color: rgba(0, 212, 255, 0.45);
+  transform: scale(1.05);
 }
 
 .card__title {
