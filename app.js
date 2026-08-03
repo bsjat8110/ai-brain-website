@@ -2,11 +2,14 @@
    AI Brain Startup — High-DPI 4K 3D Canvas & Interactive Logic
    ========================================================================== */
 
-/* Global Mobile Drawer Toggle Function - Instant Execution */
+/* Global Mobile Drawer Toggle Function - Instant 1-Tap Execution with 250ms Debounce Lock */
+let lastToggleTime = 0;
 window.toggleMobileDrawer = function(e) {
-  if (e) {
-    if (typeof e.stopPropagation === 'function') e.stopPropagation();
-  }
+  const now = Date.now();
+  if (now - lastToggleTime < 250) return;
+  lastToggleTime = now;
+
+  if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
   const d = document.getElementById('mobileDrawer');
   const o = document.getElementById('mobileOverlay');
   const t = document.getElementById('mobileToggle');
@@ -325,41 +328,22 @@ function initMobileDrawer() {
   const toggle = document.getElementById('mobileToggle');
   const closeBtn = document.getElementById('btnCloseDrawer');
 
-  window.toggleMobileDrawer = function(e) {
-    if (e && e.stopPropagation) e.stopPropagation();
-    const d = document.getElementById('mobileDrawer');
-    const o = document.getElementById('mobileOverlay');
-    const t = document.getElementById('mobileToggle');
-    if (!d) return;
-
-    const isActive = d.classList.contains('active');
-    if (isActive) {
-      d.classList.remove('active');
-      if (o) o.classList.remove('active');
-      if (t) t.setAttribute('aria-expanded', 'false');
-      document.body.style.overflow = '';
-    } else {
-      d.classList.add('active');
-      if (o) o.classList.add('active');
-      if (t) t.setAttribute('aria-expanded', 'true');
-      document.body.style.overflow = 'hidden';
-    }
-  };
-
   if (toggle) {
-    toggle.onclick = window.toggleMobileDrawer;
-    toggle.addEventListener('touchstart', function(e) {
-      e.preventDefault();
+    toggle.onclick = function(e) {
+      if (e) e.preventDefault();
       window.toggleMobileDrawer(e);
-    }, { passive: false });
+    };
   }
 
   if (closeBtn) {
-    closeBtn.onclick = function() {
+    closeBtn.onclick = function(e) {
+      if (e) e.preventDefault();
       const d = document.getElementById('mobileDrawer');
       const o = document.getElementById('mobileOverlay');
+      const t = document.getElementById('mobileToggle');
       if (d) d.classList.remove('active');
       if (o) o.classList.remove('active');
+      if (t) t.setAttribute('aria-expanded', 'false');
       document.body.style.overflow = '';
     };
   }
@@ -368,24 +352,39 @@ function initMobileDrawer() {
     overlay.onclick = function() {
       const d = document.getElementById('mobileDrawer');
       const o = document.getElementById('mobileOverlay');
+      const t = document.getElementById('mobileToggle');
       if (d) d.classList.remove('active');
       if (o) o.classList.remove('active');
+      if (t) t.setAttribute('aria-expanded', 'false');
       document.body.style.overflow = '';
     };
   }
 
-  if (drawer) {
-    const drawerLinks = drawer.querySelectorAll('a');
-    drawerLinks.forEach(link => {
-      link.onclick = function() {
+  // Smooth Navigation for all Module Links (#architecture, #cloud-infra, #agents, #calculator, #demo)
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function(e) {
+      const targetId = this.getAttribute('href');
+      if (!targetId || targetId === '#') return;
+      
+      const targetEl = document.querySelector(targetId);
+      if (targetEl) {
+        e.preventDefault();
+        // Close drawer if open
         const d = document.getElementById('mobileDrawer');
         const o = document.getElementById('mobileOverlay');
+        const t = document.getElementById('mobileToggle');
         if (d) d.classList.remove('active');
         if (o) o.classList.remove('active');
+        if (t) t.setAttribute('aria-expanded', 'false');
         document.body.style.overflow = '';
-      };
+
+        // Smooth scroll to target module
+        setTimeout(() => {
+          targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 30);
+      }
     });
-  }
+  });
 }
 
 /* --------------------------------------------------------------------------
