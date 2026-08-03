@@ -3182,11 +3182,13 @@ pre, code, .terminal-body, .code-content { overflow-x: auto; max-width: 100%; wo
   font-family: var(--font-heading);
   font-size: clamp(2.2rem, 5.5vw, 4.2rem);
   font-weight: 900;
-  color: #f0f9ff;
   display: block;
-  opacity: 0.95;
   letter-spacing: -0.03em;
-  text-shadow: 0 0 25px rgba(59, 130, 246, 0.3);
+  background: linear-gradient(135deg, #38bdf8 0%, #818cf8 50%, #c084fc 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 25px rgba(56, 189, 248, 0.45));
 }
 
 .hero-word-brand {
@@ -3196,29 +3198,32 @@ pre, code, .terminal-body, .code-content { overflow-x: auto; max-width: 100%; wo
   font-weight: 900;
   line-height: 1.0;
   letter-spacing: -0.04em;
-  filter: drop-shadow(0 0 45px rgba(0, 240, 255, 0.65));
+  filter: drop-shadow(0 0 50px rgba(0, 240, 255, 0.75)) drop-shadow(0 0 30px rgba(139, 92, 246, 0.5));
 }
 .hero-word-brand .gradient-text, .hero-title .gradient-text {
-  background: linear-gradient(135deg, #00f0ff 0%, #3b82f6 40%, #6366f1 75%, #a855f7 100%);
+  background: linear-gradient(135deg, #00f0ff 0%, #3b82f6 30%, #8b5cf6 65%, #d946ef 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  animation: hueShiftBlue 8s ease-in-out infinite alternate;
+  animation: hueShiftNextGen 8s ease-in-out infinite alternate;
 }
-@keyframes hueShiftBlue {
+@keyframes hueShiftNextGen {
   0%   { filter: hue-rotate(0deg); }
-  100% { filter: hue-rotate(40deg); }
+  100% { filter: hue-rotate(35deg); }
 }
 
 .hero-word-cognitive {
   display: block;
   font-family: var(--font-heading);
   font-size: clamp(1.8rem, 4.5vw, 3.4rem);
-  font-weight: 700;
-  color: #93c5fd;
+  font-weight: 800;
   letter-spacing: -0.02em;
   line-height: 1.1;
-  text-shadow: 0 0 20px rgba(0, 240, 255, 0.25);
+  background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 50%, #c084fc 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 25px rgba(167, 139, 250, 0.45));
 }
 
 /* ── Hero Tagline ── */
