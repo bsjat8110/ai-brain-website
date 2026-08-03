@@ -52,33 +52,23 @@ function initNeuralCanvas() {
   let innerPoints = [];
   let signalPulses = [];
   
-  const outerNodeCount = 55;
-  const innerNodeCount = 22;
-  let angleX = 0.002;
-  let angleY = 0.0035;
-  let innerAngleX = -0.003;
-  let innerAngleY = -0.005;
-  let isCanvasVisible = true;
-  let time = 0;
-
-  // IntersectionObserver to pause rendering when offscreen
-  const observer = new IntersectionObserver((entries) => {
-    isCanvasVisible = entries[0].isIntersecting;
-  }, { threshold: 0.1 });
-  observer.observe(canvas);
+  let rotAngleX = 0;
+  let rotAngleY = 0;
+  let inRotAngleX = 0;
+  let inRotAngleY = 0;
 
   function generateSpherePoints(count, r) {
     const pts = [];
     const phi = Math.PI * (3 - Math.sqrt(5)); // Golden ratio angle
     for (let i = 0; i < count; i++) {
       const y = 1 - (i / (count - 1)) * 2;
-      const radiusAtY = Math.sqrt(1 - y * y);
+      const radiusAtY = Math.sqrt(Math.max(0, 1 - y * y));
       const theta = phi * i;
 
       pts.push({
-        x: Math.cos(theta) * radiusAtY * r,
-        y: y * r,
-        z: Math.sin(theta) * radiusAtY * r,
+        baseX: Math.cos(theta) * radiusAtY * r,
+        baseY: y * r,
+        baseZ: Math.sin(theta) * radiusAtY * r,
         pulse: Math.random() * Math.PI * 2
       });
     }
@@ -87,21 +77,24 @@ function initNeuralCanvas() {
 
   function resize() {
     dpr = window.devicePixelRatio || 1;
-    const rect = canvas.parentElement.getBoundingClientRect();
-    width = rect.width || 320;
-    height = rect.height || 320;
+    const parent = canvas.parentElement;
+    const rect = parent ? parent.getBoundingClientRect() : { width: 320, height: 320 };
+    const size = Math.min(rect.width, rect.height) || 320;
+    width = size;
+    height = size;
 
-    canvas.width = width * dpr;
-    canvas.height = height * dpr;
+    canvas.width = size * dpr;
+    canvas.height = size * dpr;
     ctx.scale(dpr, dpr);
+    canvas.style.width = `${size}px`;
+    canvas.style.height = `${size}px`;
 
-    const outerRadius = Math.min(width, height) * 0.38;
+    const outerRadius = size * 0.38;
     const innerRadius = outerRadius * 0.42;
 
     outerPoints = generateSpherePoints(outerNodeCount, outerRadius);
     innerPoints = generateSpherePoints(innerNodeCount, innerRadius);
 
-    // Initialize 8 dynamic synaptic energy pulses traveling between nodes
     signalPulses = [];
     for (let i = 0; i < 10; i++) {
       signalPulses.push({
@@ -119,8 +112,8 @@ function initNeuralCanvas() {
   let mouseX = 0, mouseY = 0;
   function handleMove(clientX, clientY) {
     const rect = canvas.getBoundingClientRect();
-    mouseX = (clientX - rect.left - width / 2) * 0.00004;
-    mouseY = (clientY - rect.top - height / 2) * 0.00004;
+    mouseX = (clientX - rect.left - width / 2) * 0.00008;
+    mouseY = (clientY - rect.top - height / 2) * 0.00008;
   }
 
   window.addEventListener('mousemove', (e) => handleMove(e.clientX, e.clientY), { passive: true });
@@ -130,22 +123,23 @@ function initNeuralCanvas() {
     }
   }, { passive: true });
 
-  function projectPoint(p, rotX, rotY, cx, cy) {
-    let x1 = p.x * Math.cos(rotY) - p.z * Math.sin(rotY);
-    let z1 = p.z * Math.cos(rotY) + p.x * Math.sin(rotY);
+  // Pure 3D projection function — NO MUTATION of base point coordinates (prevents distortion/flattening)
+  function projectPoint(p, rx, ry, cx, cy) {
+    const cosY = Math.cos(ry);
+    const sinY = Math.sin(ry);
+    const x1 = p.baseX * cosY - p.baseZ * sinY;
+    const z1 = p.baseZ * cosY + p.baseX * sinY;
 
-    let y2 = p.y * Math.cos(rotX) - z1 * Math.sin(rotX);
-    let z2 = z1 * Math.cos(rotX) + p.y * Math.sin(rotX);
+    const cosX = Math.cos(rx);
+    const sinX = Math.sin(rx);
+    const y2 = p.baseY * cosX - z1 * sinX;
+    const z2 = z1 * cosX + p.baseY * sinX;
 
-    p.x = x1;
-    p.y = y2;
-    p.z = z2;
-
-    const perspective = 320;
+    const perspective = 340;
     const scale = perspective / (perspective + z2);
     return {
-      x: p.x * scale + cx,
-      y: p.y * scale + cy,
+      x: x1 * scale + cx,
+      y: y2 * scale + cy,
       z: z2,
       scale: scale,
       pulse: p.pulse
@@ -157,23 +151,28 @@ function initNeuralCanvas() {
       ctx.clearRect(0, 0, width, height);
       time += 0.02;
 
+      rotAngleX += 0.003;
+      rotAngleY += 0.005;
+      inRotAngleX -= 0.004;
+      inRotAngleY -= 0.006;
+
       const cx = width / 2;
       const cy = height / 2;
 
-      // 1. Draw Background Radial Quantum Energy Glow
-      const bgGlow = ctx.createRadialGradient(cx, cy, 5, cx, cy, Math.min(width, height) * 0.45);
+      // Draw Background Radial Quantum Energy Glow
+      const bgGlow = ctx.createRadialGradient(cx, cy, 5, cx, cy, width * 0.45);
       bgGlow.addColorStop(0, 'rgba(0, 240, 255, 0.15)');
       bgGlow.addColorStop(0.5, 'rgba(112, 0, 255, 0.08)');
       bgGlow.addColorStop(1, 'rgba(0, 0, 0, 0)');
       ctx.fillStyle = bgGlow;
       ctx.beginPath();
-      ctx.arc(cx, cy, Math.min(width, height) * 0.45, 0, Math.PI * 2);
+      ctx.arc(cx, cy, width * 0.45, 0, Math.PI * 2);
       ctx.fill();
 
-      const rotX = angleX + mouseY;
-      const rotY = angleY + mouseX;
-      const inRotX = innerAngleX - mouseY * 1.5;
-      const inRotY = innerAngleY - mouseX * 1.5;
+      const rotX = rotAngleX + mouseY;
+      const rotY = rotAngleY + mouseX;
+      const inRotX = inRotAngleX - mouseY * 1.5;
+      const inRotY = inRotAngleY - mouseX * 1.5;
 
       const outerProjected = outerPoints.map(p => projectPoint(p, rotX, rotY, cx, cy));
       const innerProjected = innerPoints.map(p => projectPoint(p, inRotX, inRotY, cx, cy));
