@@ -78,8 +78,14 @@ function initNeuralCanvas() {
   function resize() {
     dpr = window.devicePixelRatio || 1;
     const parent = canvas.parentElement;
-    const rect = parent ? parent.getBoundingClientRect() : { width: 320, height: 320 };
-    const size = Math.min(rect.width, rect.height) || 320;
+    const rect = parent ? parent.getBoundingClientRect() : null;
+    let size = 280;
+    if (rect && rect.width > 20) {
+      size = (rect.height > 20) ? Math.min(rect.width, rect.height) : rect.width;
+    } else {
+      size = Math.min(window.innerWidth * 0.75, 340);
+    }
+    size = Math.max(160, Math.round(size));
     width = size;
     height = size;
 
@@ -159,10 +165,11 @@ function initNeuralCanvas() {
       const cx = width / 2;
       const cy = height / 2;
 
-      // Draw Background Radial Quantum Energy Glow
+      // Draw Background Radial Quantum AGI Energy Glow
       const bgGlow = ctx.createRadialGradient(cx, cy, 5, cx, cy, width * 0.45);
-      bgGlow.addColorStop(0, 'rgba(0, 240, 255, 0.15)');
-      bgGlow.addColorStop(0.5, 'rgba(112, 0, 255, 0.08)');
+      bgGlow.addColorStop(0, 'rgba(0, 240, 255, 0.22)');
+      bgGlow.addColorStop(0.4, 'rgba(59, 130, 246, 0.14)');
+      bgGlow.addColorStop(0.8, 'rgba(139, 92, 246, 0.06)');
       bgGlow.addColorStop(1, 'rgba(0, 0, 0, 0)');
       ctx.fillStyle = bgGlow;
       ctx.beginPath();
@@ -177,7 +184,7 @@ function initNeuralCanvas() {
       const outerProjected = outerPoints.map(p => projectPoint(p, rotX, rotY, cx, cy));
       const innerProjected = innerPoints.map(p => projectPoint(p, inRotX, inRotY, cx, cy));
 
-      // 2. Draw Outer Sphere Synaptic Network Lines
+      // Draw Outer Sphere Synaptic Network Lines (Next-Gen Quantum Blue & Cyan)
       const maxConnectDist = width * 0.28;
       const maxDistSq = maxConnectDist * maxConnectDist;
 
@@ -192,7 +199,7 @@ function initNeuralCanvas() {
 
           if (distSq < maxDistSq) {
             const dist = Math.sqrt(distSq);
-            const alpha = (1 - dist / maxConnectDist) * 0.45;
+            const alpha = (1 - dist / maxConnectDist) * 0.5;
             const avgZ = (p1.z + p2.z) / 2;
 
             ctx.beginPath();
@@ -202,7 +209,7 @@ function initNeuralCanvas() {
             if (avgZ > 10) {
               ctx.strokeStyle = `rgba(0, 240, 255, ${alpha})`;
             } else {
-              ctx.strokeStyle = `rgba(147, 51, 234, ${alpha * 0.7})`;
+              ctx.strokeStyle = `rgba(59, 130, 246, ${alpha * 0.85})`;
             }
             ctx.lineWidth = avgZ > 20 ? 1.2 : 0.8;
             ctx.stroke();
@@ -210,7 +217,7 @@ function initNeuralCanvas() {
         }
       }
 
-      // 3. Draw Synaptic Firing Energy Pulses Moving Along Network Lines
+      // Draw Synaptic Firing Energy Pulses Moving Along Network Lines
       for (let pulse of signalPulses) {
         pulse.progress += pulse.speed;
         if (pulse.progress >= 1) {
@@ -227,8 +234,8 @@ function initNeuralCanvas() {
 
           const pulseGlow = ctx.createRadialGradient(px, py, 0, px, py, 6);
           pulseGlow.addColorStop(0, '#ffffff');
-          pulseGlow.addColorStop(0.5, 'rgba(0, 240, 255, 0.9)');
-          pulseGlow.addColorStop(1, 'rgba(0, 240, 255, 0)');
+          pulseGlow.addColorStop(0.5, 'rgba(0, 240, 255, 0.95)');
+          pulseGlow.addColorStop(1, 'rgba(59, 130, 246, 0)');
 
           ctx.fillStyle = pulseGlow;
           ctx.beginPath();
@@ -237,7 +244,7 @@ function initNeuralCanvas() {
         }
       }
 
-      // 4. Draw Inner AGI Cognitive Core Nodes & Connections
+      // Draw Inner AGI Cognitive Core Nodes & Connections (Next-Gen Quantum Violet-Blue)
       for (let i = 0; i < innerProjected.length; i++) {
         for (let j = i + 1; j < innerProjected.length; j++) {
           const p1 = innerProjected[i];
@@ -249,7 +256,7 @@ function initNeuralCanvas() {
             ctx.beginPath();
             ctx.moveTo(p1.x, p1.y);
             ctx.lineTo(p2.x, p2.y);
-            ctx.strokeStyle = `rgba(236, 72, 153, 0.45)`;
+            ctx.strokeStyle = `rgba(139, 92, 246, 0.55)`;
             ctx.lineWidth = 1;
             ctx.stroke();
           }
@@ -260,14 +267,14 @@ function initNeuralCanvas() {
         const nodeRadius = Math.max(2, 4 * p.scale);
         ctx.beginPath();
         ctx.arc(p.x, p.y, nodeRadius, 0, Math.PI * 2);
-        ctx.fillStyle = '#ec4899';
-        ctx.shadowColor = '#ec4899';
+        ctx.fillStyle = '#8b5cf6';
+        ctx.shadowColor = '#8b5cf6';
         ctx.shadowBlur = 8;
         ctx.fill();
         ctx.shadowBlur = 0;
       }
 
-      // 5. Draw Outer Nodes with Glowing Z-Depth Atmosphere
+      // Draw Outer Nodes with Glowing Z-Depth Atmosphere (Electric Cyan & AGI Quantum Blue)
       for (let p of outerProjected) {
         const nodeRadius = Math.max(1.8, 3.8 * p.scale);
         const pulseSize = Math.sin(time * 3 + p.pulse) * 0.8;
@@ -280,12 +287,12 @@ function initNeuralCanvas() {
           ctx.shadowColor = '#00f0ff';
           ctx.shadowBlur = 10;
         } else if (p.z < -30) {
-          ctx.fillStyle = 'rgba(147, 51, 234, 0.7)';
+          ctx.fillStyle = 'rgba(59, 130, 246, 0.85)';
           ctx.shadowBlur = 0;
         } else {
           ctx.fillStyle = '#38bdf8';
           ctx.shadowColor = '#38bdf8';
-          ctx.shadowBlur = 4;
+          ctx.shadowBlur = 5;
         }
 
         ctx.fill();
