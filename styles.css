@@ -3406,3 +3406,97 @@ pre, code, .terminal-body, .code-content { overflow-x: auto; max-width: 100%; wo
     padding: 24px 12px;
   }
 }
+
+/* ── Hero Mobile Viewport Fit (Ensures NO stat boxes peek into initial screen fold) ── */
+@media (max-width: 768px) {
+  .hero-section {
+    min-height: calc(100dvh - 48px) !important;
+    padding: 56px 14px 20px 14px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+    box-sizing: border-box !important;
+  }
+  .hero-container {
+    gap: 12px !important;
+    padding: 0 !important;
+    margin: 0 auto !important;
+    width: 100% !important;
+  }
+  .canvas-wrapper {
+    width: clamp(160px, 45vw, 210px) !important;
+    height: clamp(160px, 45vw, 210px) !important;
+    margin: 0 auto 4px auto !important;
+  }
+  .hero-title {
+    font-size: clamp(1.4rem, 6vw, 1.85rem) !important;
+    line-height: 1.15 !important;
+    margin-bottom: 8px !important;
+  }
+  .badge-row {
+    margin-bottom: 8px !important;
+    gap: 4px !important;
+  }
+  .badge-pill {
+    font-size: 0.62rem !important;
+    padding: 2px 8px !important;
+  }
+  .section-hud-metrics {
+    margin-top: 40px !important;
+    padding-top: 36px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-section {
+    min-height: calc(100dvh - 44px) !important;
+    padding: 50px 10px 16px 10px !important;
+  }
+  .canvas-wrapper {
+    width: clamp(140px, 42vw, 190px) !important;
+    height: clamp(140px, 42vw, 190px) !important;
+  }
+  .hero-title {
+    font-size: clamp(1.28rem, 5.8vw, 1.6rem) !important;
+  }
+}
+
+/* ── MSME Footer Badge Formatting (No line break on certificate number) ── */
+.msme-footer-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: rgba(255, 153, 51, 0.06);
+  border: 1px solid rgba(255, 153, 51, 0.35);
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 0.74rem;
+  color: var(--text-muted);
+  text-align: center;
+  margin: 0 auto 12px auto;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.msme-num-tag {
+  color: var(--text-main);
+}
+
+@media (max-width: 768px) {
+  .msme-footer-badge {
+    flex-direction: column !alignment;
+    gap: 4px !important;
+    padding: 8px 14px !important;
+    font-size: 0.68rem !important;
+    border-radius: 12px !important;
+    width: auto !important;
+    max-width: 95% !important;
+  }
+  .msme-num-tag {
+    background: rgba(0, 240, 255, 0.08);
+    padding: 3px 10px;
+    border-radius: 10px;
+    border: 1px solid rgba(0, 240, 255, 0.2);
+  }
+}
