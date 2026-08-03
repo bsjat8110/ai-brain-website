@@ -3392,3 +3392,17 @@ pre, code, .terminal-body, .code-content { overflow-x: auto; max-width: 100%; wo
   }
 }
 
+
+/* ── HUD Metrics Moved Below Hero Fold ── */
+.section-hud-metrics {
+  padding: 40px 0;
+  background: rgba(4, 7, 16, 0.5);
+  border-top: 1px solid var(--border-glass);
+  border-bottom: 1px solid var(--border-glass);
+}
+
+@media (max-width: 768px) {
+  .section-hud-metrics {
+    padding: 24px 12px;
+  }
+}
