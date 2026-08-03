@@ -56,6 +56,16 @@ function initNeuralCanvas() {
   let rotAngleY = 0;
   let inRotAngleX = 0;
   let inRotAngleY = 0;
+  let isCanvasVisible = true;
+  let time = 0;
+  const outerNodeCount = 55;
+  const innerNodeCount = 22;
+
+  // IntersectionObserver to pause rendering when offscreen
+  const observer = new IntersectionObserver((entries) => {
+    isCanvasVisible = entries[0].isIntersecting;
+  }, { threshold: 0.1 });
+  observer.observe(canvas);
 
   function generateSpherePoints(count, r) {
     const pts = [];

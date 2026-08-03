@@ -3157,7 +3157,7 @@ pre, code, .terminal-body, .code-content { overflow-x: auto; max-width: 100%; wo
 /* ── Canvas Wrapper — Always Square ── */
 .canvas-wrapper {
   aspect-ratio: 1 / 1 !important;
-  overflow: hidden !important;
+  overflow: visible !important;
   flex-shrink: 0 !important;
   position: relative;
 }
@@ -3165,7 +3165,6 @@ pre, code, .terminal-body, .code-content { overflow-x: auto; max-width: 100%; wo
   display: block;
   width: 100% !important;
   height: 100% !important;
-  border-radius: 50%;
 }
 
 /* ── Hero Title — Stunning 3-line layout ── */
