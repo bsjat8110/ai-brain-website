@@ -67,14 +67,18 @@ function initNeuralCanvas() {
   observer.observe(canvas);
 
   const resize = () => {
-      width = window.innerWidth;
-      height = window.innerHeight;
       dpr = window.devicePixelRatio || 1;
-      canvas.width = width * dpr;
-      canvas.height = height * dpr;
+      // Use wrapper dimensions so sphere stays perfectly square
+      const wrapper = canvas.parentElement;
+      const rect = wrapper ? wrapper.getBoundingClientRect() : null;
+      const size = rect ? Math.min(rect.width, rect.height) || rect.width : Math.min(window.innerWidth, 400);
+      width = size;
+      height = size;
+      canvas.width = size * dpr;
+      canvas.height = size * dpr;
       ctx.scale(dpr, dpr);
-      canvas.style.width = `${width}px`;
-      canvas.style.height = `${height}px`;
+      canvas.style.width = `${size}px`;
+      canvas.style.height = `${size}px`;
   };
 
   window.addEventListener('resize', resize);

@@ -3137,3 +3137,258 @@ pre, code, .terminal-body, .code-content { overflow-x: auto; max-width: 100%; wo
 .hero-bg-glow { max-width: 100vw; overflow: hidden; }
 .terminal-body::-webkit-scrollbar, .demo-chat::-webkit-scrollbar { height: 4px; width: 4px; }
 .terminal-body::-webkit-scrollbar-thumb, .demo-chat::-webkit-scrollbar-thumb { background: rgba(0,240,255,0.3); border-radius: 4px; }
+
+/* ==========================================================================
+   HERO TITLE REDESIGN — Beautiful "Autonomous AI Brain Cognitive Engine"
+   NAVBAR SLIM — Thin elegant strip
+   CANVAS SQUARE FIX — Always perfect circle/sphere
+   ========================================================================== */
+
+/* ── Navbar Slim ── */
+.navbar {
+  padding: 0 !important;
+}
+.nav-container {
+  height: 52px !important;
+  min-height: 52px !important;
+  padding: 0 clamp(16px, 3vw, 40px) !important;
+}
+
+/* ── Canvas Wrapper — Always Square ── */
+.canvas-wrapper {
+  aspect-ratio: 1 / 1 !important;
+  overflow: hidden !important;
+  flex-shrink: 0 !important;
+  position: relative;
+}
+.canvas-wrapper canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: 50%;
+}
+
+/* ── Hero Title — Stunning 3-line layout ── */
+.hero-title-main {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0;
+  margin-bottom: 18px;
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+}
+
+.hero-word-autonomous {
+  font-family: var(--font-heading);
+  font-size: clamp(2.2rem, 5.5vw, 4.2rem);
+  font-weight: 900;
+  color: var(--text-main);
+  display: block;
+  opacity: 0.85;
+  letter-spacing: -0.03em;
+}
+
+.hero-word-brand {
+  display: block;
+  font-family: var(--font-heading);
+  font-size: clamp(3rem, 8vw, 6.4rem);
+  font-weight: 900;
+  line-height: 1.0;
+  letter-spacing: -0.04em;
+  filter: drop-shadow(0 0 40px rgba(0, 240, 255, 0.4));
+}
+.hero-word-brand .gradient-text {
+  background: linear-gradient(135deg, #00f0ff 0%, #a78bfa 40%, #ff007f 80%, #ffd700 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: hueShift 6s linear infinite;
+}
+@keyframes hueShift {
+  0%   { filter: hue-rotate(0deg); }
+  100% { filter: hue-rotate(360deg); }
+}
+
+.hero-word-cognitive {
+  display: block;
+  font-family: var(--font-heading);
+  font-size: clamp(1.8rem, 4.5vw, 3.4rem);
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.7);
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+/* ── Hero Tagline ── */
+.hero-tagline {
+  font-size: clamp(0.9rem, 1.8vw, 1.15rem);
+  color: var(--text-muted);
+  line-height: 1.6;
+  max-width: 420px;
+  margin-bottom: 0;
+  font-style: italic;
+  opacity: 0.85;
+  border-left: 2px solid var(--cyan);
+  padding-left: 14px;
+}
+
+/* ── Hero container layout — side by side on desktop ── */
+.hero-container {
+  display: flex;
+  align-items: center;
+  gap: 40px;
+  padding: 80px clamp(20px, 5vw, 80px) 40px;
+  min-height: calc(100vh - 52px);
+  max-width: 1380px;
+  margin: 0 auto;
+}
+.hero-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.hero-visual {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── Footer fix — ensure content is visible ── */
+.footer {
+  position: relative;
+  z-index: 1;
+  padding: 70px clamp(20px, 5vw, 48px) 36px;
+  background: #020308;
+  border-top: 1px solid var(--border-glass);
+}
+.footer-grid {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1fr 1fr;
+  gap: 40px;
+  margin-bottom: 40px;
+}
+.footer-col h3, .footer-col h4 {
+  color: var(--text-main);
+  font-size: 0.95rem;
+  margin-bottom: 16px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.footer-col ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.footer-col a {
+  color: var(--text-muted);
+  font-size: 0.88rem;
+  transition: color 0.2s;
+}
+.footer-col a:hover { color: var(--cyan); }
+.footer-bottom {
+  padding-top: 24px;
+  border-top: 1px solid var(--border-glass);
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+/* ── Mobile responsive overrides for new hero layout ── */
+@media (max-width: 1024px) {
+  .hero-container {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding-top: 70px;
+    padding-bottom: 30px;
+    min-height: auto;
+    gap: 24px;
+  }
+  .hero-visual { order: -1; }
+  .hero-content { order: 1; align-items: center; }
+  .hero-title-main { align-items: center; }
+  .hero-tagline {
+    border-left: none;
+    padding-left: 0;
+    border-top: 1px solid rgba(0,240,255,0.3);
+    padding-top: 12px;
+    max-width: 90%;
+    text-align: center;
+  }
+  .hero-word-autonomous {
+    font-size: clamp(1.8rem, 5vw, 3rem);
+  }
+  .hero-word-brand {
+    font-size: clamp(2.6rem, 8vw, 4.5rem);
+  }
+  .hero-word-cognitive {
+    font-size: clamp(1.5rem, 4.5vw, 2.4rem);
+  }
+  .footer-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+  }
+}
+
+@media (max-width: 768px) {
+  .nav-container {
+    height: 48px !important;
+    min-height: 48px !important;
+    padding: 0 14px !important;
+  }
+  .hero-container {
+    padding-top: 62px;
+    padding-inline: 16px;
+    gap: 16px;
+  }
+  .hero-word-autonomous {
+    font-size: clamp(1.4rem, 7vw, 2.2rem);
+  }
+  .hero-word-brand {
+    font-size: clamp(2.2rem, 10vw, 3.5rem);
+  }
+  .hero-word-cognitive {
+    font-size: clamp(1.2rem, 5.5vw, 1.9rem);
+  }
+  .hero-tagline {
+    font-size: 0.85rem;
+    max-width: 100%;
+  }
+  .canvas-wrapper {
+    width: clamp(200px, 60vw, 300px) !important;
+    height: clamp(200px, 60vw, 300px) !important;
+  }
+  .footer { padding: 48px 16px 28px; }
+  .footer-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .nav-container {
+    height: 44px !important;
+    min-height: 44px !important;
+    padding: 0 12px !important;
+  }
+  .hero-word-autonomous { font-size: clamp(1.2rem, 7.5vw, 1.8rem); }
+  .hero-word-brand { font-size: clamp(1.9rem, 11vw, 2.8rem); }
+  .hero-word-cognitive { font-size: clamp(1rem, 5.5vw, 1.6rem); }
+  .canvas-wrapper {
+    width: clamp(170px, 65vw, 240px) !important;
+    height: clamp(170px, 65vw, 240px) !important;
+  }
+  .footer-grid {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+}
+
