@@ -1,18 +1,18 @@
-# AI Brain Startup (`aibrainstartup.com`)
+# AI Brain Startup
 
 > Building Persistent Artificial Intelligence, Cognitive Hypergraph Memory Engine & Autonomous Swarm Infrastructure for Enterprises and Researchers.
 
 ## Core Navigation & System Links
-- **Homepage**: https://aibrainstartup.com/
-- **About**: https://aibrainstartup.com/about
-- **Contact**: https://aibrainstartup.com/contact
-- **Architecture**: https://aibrainstartup.com/architecture
-- **Developer Docs**: https://aibrainstartup.com/docs
-- **Sitemap**: https://aibrainstartup.com/sitemap.xml
-- **Robots Directives**: https://aibrainstartup.com/robots.txt
-- **Privacy Policy**: https://aibrainstartup.com/privacy-policy
-- **Terms of Service**: https://aibrainstartup.com/terms-of-service
-- **Full LLM Manifest**: https://aibrainstartup.com/llms-full.txt
+- [Homepage](https://aibrainstartup.com/)
+- [About](https://aibrainstartup.com/about)
+- [Contact](https://aibrainstartup.com/contact)
+- [Architecture](https://aibrainstartup.com/architecture)
+- [Developer Docs](https://aibrainstartup.com/docs)
+- [Sitemap](https://aibrainstartup.com/sitemap.xml)
+- [Robots Directives](https://aibrainstartup.com/robots.txt)
+- [Privacy Policy](https://aibrainstartup.com/privacy-policy)
+- [Terms of Service](https://aibrainstartup.com/terms-of-service)
+- [Full LLM Manifest](https://aibrainstartup.com/llms-full.txt)
 
 ## Corporate Profile & Entity Authority
 - **Legal Entity**: AI Brain Inc.

@@ -42,260 +42,261 @@ document.addEventListener('DOMContentLoaded', () => {
 /* --------------------------------------------------------------------------
    1. Next-Generation AGI Dual-Core Quantum 3D Neural Sphere Animation
    -------------------------------------------------------------------------- */
+
+
 function initNeuralCanvas() {
   const canvas = document.getElementById('neuralCanvas');
   if (!canvas) return;
 
-  const ctx = canvas.getContext('2d', { alpha: true });
+  const ctx = canvas.getContext('2d', { alpha: false });
   let width, height, dpr;
-  let outerPoints = [];
-  let innerPoints = [];
-  let signalPulses = [];
+  let brainNodes = [];
+  const numBrainNodes = window.innerWidth < 768 ? 400 : 800;
+  const fov = 500;
   
-  const outerNodeCount = 55;
-  const innerNodeCount = 22;
-  let angleX = 0.002;
-  let angleY = 0.0035;
-  let innerAngleX = -0.003;
-  let innerAngleY = -0.005;
-  let isCanvasVisible = true;
-  let time = 0;
-
-  // IntersectionObserver to pause rendering when offscreen
+  let mouseX = 0;
+  let mouseY = 0;
+  let targetMouseX = 0;
+  let targetMouseY = 0;
+  
+  // Performance Observer
+  let isVisible = true;
   const observer = new IntersectionObserver((entries) => {
-    isCanvasVisible = entries[0].isIntersecting;
-  }, { threshold: 0.1 });
+      isVisible = entries[0].isIntersecting;
+  });
   observer.observe(canvas);
 
-  function generateSpherePoints(count, r) {
-    const pts = [];
-    const phi = Math.PI * (3 - Math.sqrt(5)); // Golden ratio angle
-    for (let i = 0; i < count; i++) {
-      const y = 1 - (i / (count - 1)) * 2;
-      const radiusAtY = Math.sqrt(1 - y * y);
-      const theta = phi * i;
+  const resize = () => {
+      width = window.innerWidth;
+      height = window.innerHeight;
+      dpr = window.devicePixelRatio || 1;
+      canvas.width = width * dpr;
+      canvas.height = height * dpr;
+      ctx.scale(dpr, dpr);
+      canvas.style.width = `${width}px`;
+      canvas.style.height = `${height}px`;
+  };
 
-      pts.push({
-        x: Math.cos(theta) * radiusAtY * r,
-        y: y * r,
-        z: Math.sin(theta) * radiusAtY * r,
-        pulse: Math.random() * Math.PI * 2
-      });
-    }
-    return pts;
-  }
-
-  function resize() {
-    dpr = window.devicePixelRatio || 1;
-    const rect = canvas.parentElement.getBoundingClientRect();
-    width = rect.width || 320;
-    height = rect.height || 320;
-
-    canvas.width = width * dpr;
-    canvas.height = height * dpr;
-    ctx.scale(dpr, dpr);
-
-    const outerRadius = Math.min(width, height) * 0.38;
-    const innerRadius = outerRadius * 0.42;
-
-    outerPoints = generateSpherePoints(outerNodeCount, outerRadius);
-    innerPoints = generateSpherePoints(innerNodeCount, innerRadius);
-
-    // Initialize 8 dynamic synaptic energy pulses traveling between nodes
-    signalPulses = [];
-    for (let i = 0; i < 10; i++) {
-      signalPulses.push({
-        from: Math.floor(Math.random() * outerNodeCount),
-        to: Math.floor(Math.random() * outerNodeCount),
-        progress: Math.random(),
-        speed: 0.01 + Math.random() * 0.015
-      });
-    }
-  }
-
-  window.addEventListener('resize', resize, { passive: true });
+  window.addEventListener('resize', resize);
   resize();
 
-  let mouseX = 0, mouseY = 0;
-  function handleMove(clientX, clientY) {
-    const rect = canvas.getBoundingClientRect();
-    mouseX = (clientX - rect.left - width / 2) * 0.00004;
-    mouseY = (clientY - rect.top - height / 2) * 0.00004;
+  window.addEventListener('mousemove', (e) => {
+      targetMouseX = (e.clientX - width / 2) * 0.5;
+      targetMouseY = (e.clientY - height / 2) * 0.5;
+  });
+
+  // BRAIN GENERATOR (Two hemispheres)
+  class BrainNode {
+      constructor() {
+          // Rejection sampling for brain shape
+          let valid = false;
+          while(!valid) {
+              this.x = (Math.random() - 0.5) * 400;
+              this.y = (Math.random() - 0.5) * 300;
+              this.z = (Math.random() - 0.5) * 400;
+              
+              // Ellipsoid equation
+              const rx = this.x / 200;
+              const ry = this.y / 150;
+              const rz = this.z / 200;
+              if (rx*rx + ry*ry + rz*rz < 1) {
+                  // Carve out center (longitudinal fissure)
+                  if (Math.abs(this.x) > 10) {
+                      valid = true;
+                  }
+              }
+          }
+          
+          this.origX = this.x;
+          this.origY = this.y;
+          this.origZ = this.z;
+          this.angle = Math.random() * Math.PI * 2;
+          this.speed = Math.random() * 0.02 + 0.01;
+          this.radius = Math.random() * 1.5 + 0.5;
+          this.color = `rgba(255, 215, 0, ${Math.random() * 0.5 + 0.5})`; // Gold
+      }
+      
+      update(time) {
+          // Rotate brain slowly
+          const rotY = time * 0.5;
+          const cosY = Math.cos(rotY);
+          const sinY = Math.sin(rotY);
+          
+          let rx = this.origX * cosY - this.origZ * sinY;
+          let rz = this.origZ * cosY + this.origX * sinY;
+          
+          // Pulsing effect
+          this.y = this.origY + Math.sin(time * this.speed * 10 + this.origX) * 5;
+          
+          // Hover offset
+          const hoverOffset = Math.sin(time) * 20;
+
+          // Apply mouse perspective
+          this.drawX = rx;
+          this.drawY = this.y - 100 + hoverOffset; // Move brain up slightly
+          this.drawZ = rz + 600; // Move brain away
+      }
+
+      draw() {
+          if (this.drawZ < 1) return;
+          const scale = fov / this.drawZ;
+          const x2d = (this.drawX - mouseX*0.3) * scale + width / 2;
+          const y2d = (this.drawY - mouseY*0.3) * scale + height / 2;
+
+          if (x2d >= 0 && x2d <= width && y2d >= 0 && y2d <= height) {
+              ctx.beginPath();
+              ctx.arc(x2d, y2d, this.radius * scale, 0, Math.PI * 2);
+              ctx.fillStyle = this.color;
+              ctx.shadowBlur = 10 * scale;
+              ctx.shadowColor = '#FFD700'; // Gold glow
+              ctx.fill();
+              ctx.shadowBlur = 0;
+          }
+      }
   }
 
-  window.addEventListener('mousemove', (e) => handleMove(e.clientX, e.clientY), { passive: true });
-  window.addEventListener('touchmove', (e) => {
-    if (e.touches.length > 0) {
-      handleMove(e.touches[0].clientX, e.touches[0].clientY);
-    }
-  }, { passive: true });
-
-  function projectPoint(p, rotX, rotY, cx, cy) {
-    let x1 = p.x * Math.cos(rotY) - p.z * Math.sin(rotY);
-    let z1 = p.z * Math.cos(rotY) + p.x * Math.sin(rotY);
-
-    let y2 = p.y * Math.cos(rotX) - z1 * Math.sin(rotX);
-    let z2 = z1 * Math.cos(rotX) + p.y * Math.sin(rotX);
-
-    p.x = x1;
-    p.y = y2;
-    p.z = z2;
-
-    const perspective = 320;
-    const scale = perspective / (perspective + z2);
-    return {
-      x: p.x * scale + cx,
-      y: p.y * scale + cy,
-      z: z2,
-      scale: scale,
-      pulse: p.pulse
-    };
+  for (let i = 0; i < numBrainNodes; i++) {
+      brainNodes.push(new BrainNode());
   }
 
-  function animate() {
-    if (isCanvasVisible) {
-      ctx.clearRect(0, 0, width, height);
+  const drawCircuitFloor = (time) => {
+      ctx.lineWidth = 1;
+      ctx.shadowBlur = 5;
+      ctx.shadowColor = '#00e5ff'; // Cyan glow
+      
+      const floorY = 250; // Floor height below center
+      const gridSpacingX = 100;
+      const gridSpacingZ = 100;
+      
+      // Moving Z offset to simulate forward motion
+      const zOffset = (time * 100) % gridSpacingZ;
+      
+      // Draw grid lines
+      for (let i = -10; i <= 10; i++) {
+          // Vertical lines (Z-axis)
+          const lineX = i * gridSpacingX;
+          
+          const zStart = 100;
+          const zEnd = 2000;
+          
+          const scaleStart = fov / zStart;
+          const scaleEnd = fov / zEnd;
+          
+          const x1 = (lineX - mouseX*0.1) * scaleStart + width / 2;
+          const y1 = (floorY - mouseY*0.1) * scaleStart + height / 2;
+          
+          const x2 = (lineX - mouseX*0.1) * scaleEnd + width / 2;
+          const y2 = (floorY - mouseY*0.1) * scaleEnd + height / 2;
+          
+          const grad = ctx.createLinearGradient(x1, y1, x2, y2);
+          grad.addColorStop(0, 'rgba(0, 229, 255, 0.8)');
+          grad.addColorStop(1, 'rgba(0, 229, 255, 0)');
+          
+          ctx.beginPath();
+          ctx.moveTo(x1, y1);
+          ctx.lineTo(x2, y2);
+          ctx.strokeStyle = grad;
+          ctx.stroke();
+      }
+      
+      // Horizontal lines (X-axis)
+      for (let j = 1; j <= 20; j++) {
+          const lineZ = j * gridSpacingZ - zOffset + 100;
+          if (lineZ < 100) continue;
+          
+          const scale = fov / lineZ;
+          const y2d = (floorY - mouseY*0.1) * scale + height / 2;
+          
+          const xLeft = (-1000 - mouseX*0.1) * scale + width / 2;
+          const xRight = (1000 - mouseX*0.1) * scale + width / 2;
+          
+          const alpha = Math.max(0, 1 - (lineZ / 2000));
+          
+          ctx.beginPath();
+          ctx.moveTo(xLeft, y2d);
+          ctx.lineTo(xRight, y2d);
+          ctx.strokeStyle = `rgba(0, 229, 255, ${alpha * 0.5})`;
+          ctx.stroke();
+      }
+      ctx.shadowBlur = 0;
+  };
+
+  let time = 0;
+  const animate = () => {
+      if (!isVisible) {
+          requestAnimationFrame(animate);
+          return;
+      }
+      
       time += 0.02;
+      mouseX += (targetMouseX - mouseX) * 0.05;
+      mouseY += (targetMouseY - mouseY) * 0.05;
 
-      const cx = width / 2;
-      const cy = height / 2;
-
-      // 1. Draw Background Radial Quantum Energy Glow
-      const bgGlow = ctx.createRadialGradient(cx, cy, 5, cx, cy, Math.min(width, height) * 0.45);
-      bgGlow.addColorStop(0, 'rgba(0, 240, 255, 0.15)');
-      bgGlow.addColorStop(0.5, 'rgba(112, 0, 255, 0.08)');
-      bgGlow.addColorStop(1, 'rgba(0, 0, 0, 0)');
-      ctx.fillStyle = bgGlow;
+      // Dark background (Deep Space Navy)
+      ctx.fillStyle = '#020513';
+      ctx.fillRect(0, 0, width, height);
+      
+      // Core glowing light under the brain
+      const glowScale = fov / 600;
+      const glowY = (150 - mouseY*0.1) * glowScale + height/2;
+      const glowX = (0 - mouseX*0.1) * glowScale + width/2;
+      
+      ctx.globalCompositeOperation = 'screen';
+      
+      const coreGlow = ctx.createRadialGradient(glowX, glowY, 0, glowX, glowY, 300);
+      coreGlow.addColorStop(0, 'rgba(0, 229, 255, 0.15)');
+      coreGlow.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      ctx.fillStyle = coreGlow;
       ctx.beginPath();
-      ctx.arc(cx, cy, Math.min(width, height) * 0.45, 0, Math.PI * 2);
+      ctx.arc(glowX, glowY, 300, 0, Math.PI*2);
       ctx.fill();
 
-      const rotX = angleX + mouseY;
-      const rotY = angleY + mouseX;
-      const inRotX = innerAngleX - mouseY * 1.5;
-      const inRotY = innerAngleY - mouseX * 1.5;
+      // Draw Floor
+      drawCircuitFloor(time);
 
-      const outerProjected = outerPoints.map(p => projectPoint(p, rotX, rotY, cx, cy));
-      const innerProjected = innerPoints.map(p => projectPoint(p, inRotX, inRotY, cx, cy));
-
-      // 2. Draw Outer Sphere Synaptic Network Lines
-      const maxConnectDist = width * 0.28;
-      const maxDistSq = maxConnectDist * maxConnectDist;
-
-      for (let i = 0; i < outerProjected.length; i++) {
-        for (let j = i + 1; j < outerProjected.length; j++) {
-          const p1 = outerProjected[i];
-          const p2 = outerProjected[j];
-
-          const dx = p1.x - p2.x;
-          const dy = p1.y - p2.y;
-          const distSq = dx * dx + dy * dy;
-
-          if (distSq < maxDistSq) {
-            const dist = Math.sqrt(distSq);
-            const alpha = (1 - dist / maxConnectDist) * 0.45;
-            const avgZ = (p1.z + p2.z) / 2;
-
-            ctx.beginPath();
-            ctx.moveTo(p1.x, p1.y);
-            ctx.lineTo(p2.x, p2.y);
-
-            if (avgZ > 10) {
-              ctx.strokeStyle = `rgba(0, 240, 255, ${alpha})`;
-            } else {
-              ctx.strokeStyle = `rgba(147, 51, 234, ${alpha * 0.7})`;
-            }
-            ctx.lineWidth = avgZ > 20 ? 1.2 : 0.8;
-            ctx.stroke();
+      // Draw Brain
+      brainNodes.forEach(node => {
+          node.update(time);
+      });
+      
+      // Sort nodes by Z for proper rendering (painters algorithm)
+      brainNodes.sort((a, b) => b.drawZ - a.drawZ);
+      
+      // Draw Connections within the brain
+      ctx.lineWidth = 0.5;
+      for (let i = 0; i < brainNodes.length; i++) {
+          const n1 = brainNodes[i];
+          n1.draw();
+          
+          if (i % 3 !== 0) continue; // Optimization: only draw connections for a subset
+          
+          for (let j = i + 1; j < Math.min(i + 20, brainNodes.length); j++) {
+              const n2 = brainNodes[j];
+              const dx = n1.drawX - n2.drawX;
+              const dy = n1.drawY - n2.drawY;
+              const dz = n1.drawZ - n2.drawZ;
+              const distSq = dx*dx + dy*dy + dz*dz;
+              
+              if (distSq < 1500) {
+                  const scale1 = fov / n1.drawZ;
+                  const scale2 = fov / n2.drawZ;
+                  const x1 = (n1.drawX - mouseX*0.3) * scale1 + width / 2;
+                  const y1 = (n1.drawY - mouseY*0.3) * scale1 + height / 2;
+                  const x2 = (n2.drawX - mouseX*0.3) * scale2 + width / 2;
+                  const y2 = (n2.drawY - mouseY*0.3) * scale2 + height / 2;
+                  
+                  ctx.beginPath();
+                  ctx.moveTo(x1, y1);
+                  ctx.lineTo(x2, y2);
+                  ctx.strokeStyle = `rgba(255, 215, 0, ${(1 - distSq/1500) * 0.3})`;
+                  ctx.stroke();
+              }
           }
-        }
       }
 
-      // 3. Draw Synaptic Firing Energy Pulses Moving Along Network Lines
-      for (let pulse of signalPulses) {
-        pulse.progress += pulse.speed;
-        if (pulse.progress >= 1) {
-          pulse.progress = 0;
-          pulse.from = Math.floor(Math.random() * outerProjected.length);
-          pulse.to = Math.floor(Math.random() * outerProjected.length);
-        }
-
-        const pFrom = outerProjected[pulse.from];
-        const pTo = outerProjected[pulse.to];
-        if (pFrom && pTo) {
-          const px = pFrom.x + (pTo.x - pFrom.x) * pulse.progress;
-          const py = pFrom.y + (pTo.y - pFrom.y) * pulse.progress;
-
-          const pulseGlow = ctx.createRadialGradient(px, py, 0, px, py, 6);
-          pulseGlow.addColorStop(0, '#ffffff');
-          pulseGlow.addColorStop(0.5, 'rgba(0, 240, 255, 0.9)');
-          pulseGlow.addColorStop(1, 'rgba(0, 240, 255, 0)');
-
-          ctx.fillStyle = pulseGlow;
-          ctx.beginPath();
-          ctx.arc(px, py, 6, 0, Math.PI * 2);
-          ctx.fill();
-        }
-      }
-
-      // 4. Draw Inner AGI Cognitive Core Nodes & Connections
-      for (let i = 0; i < innerProjected.length; i++) {
-        for (let j = i + 1; j < innerProjected.length; j++) {
-          const p1 = innerProjected[i];
-          const p2 = innerProjected[j];
-
-          const dx = p1.x - p2.x;
-          const dy = p1.y - p2.y;
-          if (dx * dx + dy * dy < maxDistSq * 0.4) {
-            ctx.beginPath();
-            ctx.moveTo(p1.x, p1.y);
-            ctx.lineTo(p2.x, p2.y);
-            ctx.strokeStyle = `rgba(236, 72, 153, 0.45)`;
-            ctx.lineWidth = 1;
-            ctx.stroke();
-          }
-        }
-      }
-
-      for (let p of innerProjected) {
-        const nodeRadius = Math.max(2, 4 * p.scale);
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, nodeRadius, 0, Math.PI * 2);
-        ctx.fillStyle = '#ec4899';
-        ctx.shadowColor = '#ec4899';
-        ctx.shadowBlur = 8;
-        ctx.fill();
-        ctx.shadowBlur = 0;
-      }
-
-      // 5. Draw Outer Nodes with Glowing Z-Depth Atmosphere
-      for (let p of outerProjected) {
-        const nodeRadius = Math.max(1.8, 3.8 * p.scale);
-        const pulseSize = Math.sin(time * 3 + p.pulse) * 0.8;
-
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, nodeRadius + pulseSize, 0, Math.PI * 2);
-
-        if (p.z > 30) {
-          ctx.fillStyle = '#00f0ff';
-          ctx.shadowColor = '#00f0ff';
-          ctx.shadowBlur = 10;
-        } else if (p.z < -30) {
-          ctx.fillStyle = 'rgba(147, 51, 234, 0.7)';
-          ctx.shadowBlur = 0;
-        } else {
-          ctx.fillStyle = '#38bdf8';
-          ctx.shadowColor = '#38bdf8';
-          ctx.shadowBlur = 4;
-        }
-
-        ctx.fill();
-        ctx.shadowBlur = 0;
-      }
-    }
-
-    requestAnimationFrame(animate);
-  }
+      ctx.globalCompositeOperation = 'source-over';
+      requestAnimationFrame(animate);
+  };
 
   animate();
 }

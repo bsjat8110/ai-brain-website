@@ -186,23 +186,19 @@
     :root{--bg-dark:#070913;--bg-card:rgba(13,19,32,0.75);--text-main:#f8fafc;--text-muted:#94a3b8;--cyan:#00f2fe;--purple:#7000ff;--font-sans:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;--font-heading:'Outfit','Inter',sans-serif;}
     *{margin:0;padding:0;box-sizing:border-box;}
     body{background-color:var(--bg-dark);color:var(--text-main);font-family:var(--font-sans);min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased;}
-    .navbar{position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(7,9,19,0.8);backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,0.08);padding:10px 20px;}
-    .nav-container{max-width:1380px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;}
+    .navbar{position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(7,9,19,0.8);backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,0.08);padding:4px 20px;}
+    .nav-container{max-width:1380px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:0;}
     .brand-logo{display:inline-flex;align-items:center;gap:10px;text-decoration:none;font-family:var(--font-heading);font-weight:800;font-size:1.35rem;color:var(--text-main);}
     .hero-section{min-height:90vh;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;padding:120px 20px 60px 20px;}
     .hero-title{font-family:var(--font-heading);font-size:clamp(2.2rem,5vw,3.8rem);font-weight:900;line-height:1.1;text-align:center;margin-bottom:16px;}
     .gradient-text{background:linear-gradient(135deg,#00f2fe 0%,#4facfe 50%,#00c6ff 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
   </style>
 
-  <!-- Optimized Non-Blocking Google Fonts Loading -->
-  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Outfit:wght@600;800;900&display=swap" onload="this.onload=null;this.rel='stylesheet'">
-  <noscript>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Outfit:wght@600;800;900&display=swap">
-  </noscript>
+  <!-- Standard Google Fonts Loading -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Outfit:wght@600;800;900&display=swap">
 
-  <!-- Non-Blocking Async CSS Stylesheet -->
-  <link rel="preload" as="style" href="styles.css" onload="this.onload=null;this.rel='stylesheet'">
-  <noscript><link rel="stylesheet" href="styles.css"></noscript>
+  <!-- Main Stylesheet -->
+  <link rel="stylesheet" href="styles.css?v=2">
 </head>
 <body>
 
@@ -210,7 +206,7 @@
   <header class="navbar" id="navbar">
     <div class="nav-container">
       <a href="index.html" class="brand-logo" id="brandLogo">
-        <span class="logo-icon">🧠</span>
+        <span class="logo-icon"></span>
         <span class="logo-text">AI <span class="accent-text">Brain</span></span>
       </a>
       
@@ -241,7 +237,7 @@
   <div class="mobile-nav-overlay" id="mobileOverlay"></div>
   <aside class="mobile-nav-drawer" id="mobileDrawer">
     <div class="drawer-header">
-      <span class="drawer-title">🧠 Navigation</span>
+      <span class="drawer-title"> Navigation</span>
       <button class="btn-close-drawer" id="btnCloseDrawer" aria-label="Close Menu">✕</button>
     </div>
     <a href="index.html" class="mobile-nav-link">🏠 Home</a>
@@ -267,19 +263,8 @@
 
     <div class="hero-container">
       <div class="hero-content">
-        <div class="badge-row">
-          <div class="badge-pill brain-pill">
-            <span class="badge-icon">🧠</span>
-            <span>AI Brain Cognitive Hypergraph</span>
-          </div>
-          <div class="badge-pill swarm-pill">
-            <span class="badge-icon">⚡</span>
-            <span>Autonomous Swarm Intelligence</span>
-          </div>
-        </div>
-        
         <h1 class="hero-title" itemprop="name">
-          Autonomous <span class="gradient-text">AI Brain</span> Cognitive Engine
+          Cognitive <span class="gradient-text">AI Brain</span>
         </h1>
 
         <div class="hero-actions">
@@ -556,7 +541,7 @@ response = client.agents.<span class="code-keyword">run</span>(
             <span class="tab-icon">🎯</span> Strategy Agent
           </button>
           <button class="agent-tab" id="tabKnowledge" data-target="agent-knowledge" role="tab" aria-selected="false" aria-controls="agent-knowledge">
-            <span class="tab-icon">🧠</span> Knowledge Agent
+            <span class="tab-icon"></span> Knowledge Agent
           </button>
           <button class="agent-tab" id="tabAutomation" data-target="agent-automation" role="tab" aria-selected="false" aria-controls="agent-automation">
             <span class="tab-icon">⚡</span> Automation Agent
@@ -703,7 +688,7 @@ response = client.agents.<span class="code-keyword">run</span>(
         
         <div class="demo-chat" id="demoChat">
           <div class="chat-bubble ai-bubble">
-            <div class="avatar-mini">🧠</div>
+            <div class="avatar-mini"></div>
             <div class="bubble-text">
               Hello! I am AI Brain. I remember all past interactions, codebases, and research notes. What topic would you like to explore today?
             </div>
@@ -711,7 +696,7 @@ response = client.agents.<span class="code-keyword">run</span>(
         </div>
 
         <div class="demo-suggestions">
-          <button class="suggest-btn" data-query="Explain how AI Brain maintains long-term memory graph.">🧠 Explain Persistent Memory</button>
+          <button class="suggest-btn" data-query="Explain how AI Brain maintains long-term memory graph."> Explain Persistent Memory</button>
           <button class="suggest-btn" data-query="What is the roadmap for Autonomous Agents in 2026?">🚀 2026 Agent Roadmap</button>
           <button class="suggest-btn" data-query="How does AI Brain scale cloud infrastructure?">☁️ Cloud Infrastructure Scaling</button>
         </div>
@@ -779,7 +764,7 @@ response = client.agents.<span class="code-keyword">run</span>(
       <div class="footer-grid">
         <div class="footer-col brand-col">
           <div class="footer-logo">
-            <span class="logo-icon">🧠</span>
+            <span class="logo-icon"></span>
             <span class="logo-text">AI <span class="accent-text">Brain</span></span>
           </div>
           <p class="footer-tagline">Building persistent artificial intelligence and autonomous agent networks for the future of humanity.</p>
@@ -869,6 +854,6 @@ response = client.agents.<span class="code-keyword">run</span>(
   </div>
 
   <!-- Custom JavaScript (Deferred to prevent render blocking) -->
-  <script src="app.js" defer></script>
+  <script src="app.js?v=2" defer></script>
 </body>
 </html>
